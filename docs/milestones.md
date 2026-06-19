@@ -2,9 +2,9 @@
 
 | Milestone | Objective | Expected Output | Acceptance Criteria |
 | --- | --- | --- | --- |
-| Milestone 0: Project initialization | Create repository structure and architecture documentation. | Initial folders, documentation, `.gitignore`, and placeholders. | Repository contains no implementation code and documents scope, architecture, milestones, data formats, and references. |
-| Milestone 1: Netflix dataset preprocessing | Convert raw Netflix-style records into normalized ratings. | Preprocessing utility and sample normalized output. | Input parsing is tested, output format is documented, and large raw data remains untracked. |
-| Milestone 2: Python Item-CF reference implementation | Build a small deterministic reference algorithm for validation. | Python reference outputs for sample data. | Results are reproducible and suitable for comparing MapReduce job outputs. |
+| Milestone 0: Project initialization | Completed: create repository structure and architecture documentation. | Initial folders, documentation, `.gitignore`, and placeholders. | Completed with no implementation code and documented scope, architecture, milestones, data formats, and references. |
+| Milestone 1: Netflix dataset preprocessing | Completed: convert raw Netflix-style records into normalized ratings. | Python preprocessing utility, tests, documentation, and tiny sample input. | Completed after unit tests passed; input parsing is tested, output format is documented, and large raw data remains untracked. |
+| Milestone 2: Python Item-CF reference implementation | Next: build a small deterministic reference algorithm for validation. | Python reference outputs for sample data. | Results are reproducible and suitable for comparing MapReduce job outputs. |
 | Milestone 3: Maven and Hadoop environment | Add Java build configuration and local Hadoop execution plan. | Maven project files and environment notes. | Java build runs locally and Hadoop commands are documented without committing generated files. |
 | Milestone 4: User-history MapReduce job | Group ratings by user. | User-history output records. | Job output matches documented format and reference expectations on fixtures. |
 | Milestone 5: Item-pair statistics | Generate co-rated movie-pair statistics. | Pair count and rating-statistic records. | Pair generation is deterministic and tested on known user histories. |

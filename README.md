@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 0 - Project Initialization and Architecture Documentation**.
+Current status: **Milestone 1 - Netflix Prize Dataset Preprocessing completed**.
 
-No preprocessing pipeline, recommendation algorithm, Hadoop job, web UI, or evaluation code has been implemented yet.
+The Netflix raw rating preprocessor is implemented. No Item-Based Collaborative Filtering algorithm, Hadoop job, MapReduce job, web UI, or evaluation code has been implemented yet.
 
 ## Main Objectives
 
@@ -48,6 +48,7 @@ raw data
 |   |-- architecture.md
 |   |-- milestones.md
 |   |-- data_format.md
+|   |-- preprocessing.md
 |   `-- references.md
 |-- data/
 |   |-- raw/
@@ -69,8 +70,26 @@ raw data
 
 ## Data Policy
 
-Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files must not be committed to Git. Small sample fixtures may be added later under `data/sample` or `tests/fixtures` when needed for tests and documentation.
+Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files must not be committed to Git. Contents under `data/raw` and `data/processed` are ignored except for placeholder files. Only tiny reviewable sample files may be committed under `data/sample`.
 
-## Setup and Run Instructions
+## Preprocessing Usage
 
-Setup, build, data preparation, Hadoop execution, and evaluation instructions will be added in later milestones.
+Run the sample Netflix preprocessor from the repository root:
+
+```powershell
+python scripts/preprocess_netflix.py --input-dir data/sample/netflix --output data/processed/ratings.csv --stats-output data/processed/preprocess_stats.json
+```
+
+The command writes a normalized CSV with this header:
+
+```text
+userId,movieId,rating,date
+```
+
+Run the unit tests with:
+
+```powershell
+python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+Additional setup, Hadoop execution, recommendation, and evaluation instructions will be added in later milestones.
