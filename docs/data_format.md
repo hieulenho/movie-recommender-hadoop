@@ -74,3 +74,13 @@ userId,movieId,predictedScore
 ```text
 userId<TAB>movieId:score,movieId:score
 ```
+
+## Environment Smoke Output
+
+Milestone 3 includes a temporary Hadoop local-mode smoke output for environment validation only:
+
+```text
+lineCount<TAB>5
+```
+
+This format is not a recommender data format and is not used by later Item-CF logic.

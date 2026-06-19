@@ -6,11 +6,15 @@
 - Do not use absolute machine-specific paths in source code.
 - Do not commit datasets, model outputs, generated build files, secrets, or credentials.
 - Add or update tests for each implementation milestone.
+- Run existing Python tests with `python -m unittest discover -s tests -p "test_*.py" -v`.
+- For Java milestones, run Maven tests with `mvn test` and package validation with `mvn package` when Java 17 and Maven are available.
 - Prefer deterministic output.
 - Preserve documented file formats.
 - Keep Java code under `src/main/java`.
 - Keep Java tests under `src/test/java`.
 - Keep Python utilities under `scripts` unless a later architecture decision changes this.
+- Do not add unofficial Hadoop Windows binaries such as `winutils.exe`.
+- Future recommender Hadoop outputs should be checked against the Python Item-CF reference on small fixtures.
 - Do not silently change architecture.
 - Do not run destructive Git commands.
 - Do not create Git commits unless explicitly requested.
