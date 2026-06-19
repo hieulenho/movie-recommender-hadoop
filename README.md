@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 1 - Netflix Prize Dataset Preprocessing completed**.
+Current status: **Milestone 2 - Python Item-CF Reference Implementation completed**.
 
-The Netflix raw rating preprocessor is implemented. No Item-Based Collaborative Filtering algorithm, Hadoop job, MapReduce job, web UI, or evaluation code has been implemented yet.
+The Netflix raw rating preprocessor and local Python Item-CF reference implementation are implemented. Hadoop jobs, MapReduce jobs, a web UI, and evaluation metrics are not implemented yet.
 
 ## Main Objectives
 
@@ -49,6 +49,7 @@ raw data
 |   |-- milestones.md
 |   |-- data_format.md
 |   |-- preprocessing.md
+|   |-- itemcf_reference.md
 |   `-- references.md
 |-- data/
 |   |-- raw/
@@ -70,7 +71,7 @@ raw data
 
 ## Data Policy
 
-Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files must not be committed to Git. Contents under `data/raw` and `data/processed` are ignored except for placeholder files. Only tiny reviewable sample files may be committed under `data/sample`.
+Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files must not be committed to Git. Contents under `data/raw`, `data/processed`, and generated `results` outputs are ignored except for placeholder files. Only tiny reviewable sample files may be committed under `data/sample`.
 
 ## Preprocessing Usage
 
@@ -92,4 +93,20 @@ Run the unit tests with:
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-Additional setup, Hadoop execution, recommendation, and evaluation instructions will be added in later milestones.
+## Python Item-CF Reference Usage
+
+Run the cosine reference model:
+
+```powershell
+python scripts/itemcf_reference.py --input data/processed/ratings.csv --method cosine --min-common-users 1 --top-l 50 --top-k 10 --neighbors-output results/reference/cosine_neighbors.csv --recommendations-output results/reference/cosine_recommendations.csv --stats-output results/reference/cosine_stats.json
+```
+
+Run the co-occurrence reference model:
+
+```powershell
+python scripts/itemcf_reference.py --input data/processed/ratings.csv --method cooccurrence --min-common-users 1 --top-l 50 --top-k 10 --neighbors-output results/reference/cooccurrence_neighbors.csv --recommendations-output results/reference/cooccurrence_recommendations.csv --stats-output results/reference/cooccurrence_stats.json
+```
+
+Generated files under `results` are local outputs and are not committed.
+
+Additional setup, Hadoop execution, and evaluation instructions will be added in later milestones.

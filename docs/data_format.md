@@ -31,25 +31,45 @@ Example:
 
 Rows are written with UTF-8 encoding through the Python `csv` module.
 
+## Implemented Item-CF Neighbor CSV Format
+
+Milestone 2 implements the neighbor CSV format produced by `scripts/itemcf_reference.py`.
+
+```text
+sourceMovieId,neighborMovieId,similarity,commonUsers
+```
+
+Rows are ordered by source movie ID ascending, similarity descending, and neighbor movie ID ascending. Similarity values are written with 12 decimal places.
+
+## Implemented Item-CF Recommendation CSV Format
+
+Milestone 2 implements the recommendation CSV format produced by `scripts/itemcf_reference.py`.
+
+```text
+userId,rank,movieId,score
+```
+
+Rows are ordered by user ID ascending and rank ascending. Scores are written with 12 decimal places.
+
 ## Planned User-History Format
 
 ```text
 userId<TAB>movieId:rating,movieId:rating
 ```
 
-## Planned Similarity Format
+## Planned Hadoop Similarity Format
 
 ```text
 movieId<TAB>neighborId:similarity,neighborId:similarity
 ```
 
-## Planned Prediction Format
+## Planned Hadoop Prediction Format
 
 ```text
 userId,movieId,predictedScore
 ```
 
-## Planned Final Output
+## Planned Hadoop Final Output
 
 ```text
 userId<TAB>movieId:score,movieId:score

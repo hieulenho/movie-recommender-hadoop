@@ -10,7 +10,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
 - Java MapReduce jobs will perform the core distributed computations, including user-history construction, item-pair statistics, similarity calculation, prediction, watched-item filtering, and Top-K selection.
-- Python scripts will support preprocessing, validation, evaluation, and plotting.
+- Python scripts will support preprocessing, local Item-CF reference validation, evaluation, and plotting.
 - An optional demo application may load precomputed recommendation outputs for display.
 
 ## Planned Data Flow
@@ -31,3 +31,7 @@ flowchart TD
 ## Batch Execution Model
 
 Each stage writes its output as files for the next stage. This keeps the pipeline observable and reproducible, and it allows later milestones to validate intermediate formats independently.
+
+## Python Reference Validation Path
+
+Milestone 2 adds a local Python Item-CF reference implementation that reads normalized ratings and writes neighbor, recommendation, and statistics files. This does not replace the planned Hadoop architecture; it provides deterministic expected outputs for small fixtures and sample data so later MapReduce jobs can be checked against a known reference.
