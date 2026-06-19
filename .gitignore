@@ -1,0 +1,61 @@
+# Maven and Java build output
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE and editor configuration
+.idea/
+.vscode/
+.settings/
+.project
+.classpath
+*.iml
+
+# Logs
+*.log
+logs/
+
+# Environment and secret files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Operating-system generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Raw and processed datasets
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Generated result files
+results/*
+!results/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+~$*
