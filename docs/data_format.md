@@ -12,7 +12,11 @@ Netflix-style raw files group ratings under a movie identifier line ending with 
 822109,5,2005-05-13
 ```
 
-## Normalized Rating Format
+## Implemented Normalized Rating CSV Format
+
+Milestone 1 implements the normalized CSV format produced by `scripts/preprocess_netflix.py`. See `docs/preprocessing.md` for validation rules, duplicate handling, CLI usage, and statistics definitions.
+
+The CSV header is always:
 
 ```text
 userId,movieId,rating,date
@@ -24,6 +28,8 @@ Example:
 1488844,1,3,2005-09-06
 822109,1,5,2005-05-13
 ```
+
+Rows are written with UTF-8 encoding through the Python `csv` module.
 
 ## Planned User-History Format
 
