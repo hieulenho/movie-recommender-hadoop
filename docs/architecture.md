@@ -9,6 +9,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 ## Components
 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
+- Maven provides the Java build layer for compiling, testing, packaging, and running local Hadoop smoke checks.
 - Java MapReduce jobs will perform the core distributed computations, including user-history construction, item-pair statistics, similarity calculation, prediction, watched-item filtering, and Top-K selection.
 - Python scripts will support preprocessing, local Item-CF reference validation, evaluation, and plotting.
 - An optional demo application may load precomputed recommendation outputs for display.
@@ -35,3 +36,7 @@ Each stage writes its output as files for the next stage. This keeps the pipelin
 ## Python Reference Validation Path
 
 Milestone 2 adds a local Python Item-CF reference implementation that reads normalized ratings and writes neighbor, recommendation, and statistics files. This does not replace the planned Hadoop architecture; it provides deterministic expected outputs for small fixtures and sample data so later MapReduce jobs can be checked against a known reference.
+
+## Java Hadoop Environment Validation
+
+Milestone 3 adds `LineCountJob`, a minimal Hadoop local-mode smoke job that counts text input records. It validates Java compilation, JUnit execution, Maven packaging, and real Hadoop MapReduce local execution. It is not part of the recommender algorithm and should not be treated as a user-history, pair-statistics, similarity, prediction, or Top-K job.

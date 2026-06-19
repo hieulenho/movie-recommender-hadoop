@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 2 - Python Item-CF Reference Implementation completed**.
+Current status: **Milestone 3 - Maven, Java, and Hadoop Local-Mode Environment in progress**.
 
-The Netflix raw rating preprocessor and local Python Item-CF reference implementation are implemented. Hadoop jobs, MapReduce jobs, a web UI, and evaluation metrics are not implemented yet.
+The Netflix raw rating preprocessor and local Python Item-CF reference implementation are implemented. Milestone 3 adds a minimal Hadoop local-mode smoke job for environment validation only. Recommender-specific Hadoop jobs, MapReduce algorithms, a web UI, and evaluation metrics are not implemented yet.
 
 ## Main Objectives
 
@@ -50,6 +50,7 @@ raw data
 |   |-- data_format.md
 |   |-- preprocessing.md
 |   |-- itemcf_reference.md
+|   |-- hadoop_environment.md
 |   `-- references.md
 |-- data/
 |   |-- raw/
@@ -109,4 +110,38 @@ python scripts/itemcf_reference.py --input data/processed/ratings.csv --method c
 
 Generated files under `results` are local outputs and are not committed.
 
-Additional setup, Hadoop execution, and evaluation instructions will be added in later milestones.
+## Java, Maven, and Hadoop Smoke Usage
+
+Prerequisites for host validation:
+
+- Java 17
+- Maven
+- Apache Hadoop dependencies resolved through Maven
+
+Compile and run Java tests:
+
+```powershell
+mvn clean test
+```
+
+Package the normal Maven JAR:
+
+```powershell
+mvn package
+```
+
+Run the local-mode Hadoop smoke job:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_hadoop_smoke.ps1
+```
+
+Optional Docker validation:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/test_hadoop_maven_docker.ps1
+```
+
+Hadoop local mode is not a distributed cluster. HDFS and YARN are not started in this milestone.
+
+Additional recommender-specific Hadoop execution and evaluation instructions will be added in later milestones.
