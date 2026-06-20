@@ -129,4 +129,4 @@ The Python Item-CF reference already defines the duplicate policy for normalized
 - Hadoop local mode is not HDFS, YARN, pseudo-distributed mode, or a cluster.
 - Native Windows Hadoop execution remains unsupported in this repository; Docker/Linux is the validation target.
 
-The next milestone is Milestone 5: item-pair statistics.
+The downstream Hadoop stage is Milestone 5: item-pair statistics.

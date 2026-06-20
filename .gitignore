@@ -58,6 +58,8 @@ results/*
 hadoop-smoke-output/
 user-history-output/
 hadoop-user-history-output/
+item-pair-stats-output/
+hadoop-item-pair-stats-output/
 
 # Temporary files
 *.tmp

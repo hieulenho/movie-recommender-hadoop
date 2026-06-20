@@ -51,13 +51,13 @@ userId,rank,movieId,score
 
 Rows are ordered by user ID ascending and rank ascending. Scores are written with 12 decimal places.
 
-## User-History Format
+## Implemented User-History Format
 
 ```text
 userId<TAB>movieId:rating,movieId:rating
 ```
 
-Milestone 4 adds the Hadoop user-history implementation and fixture format. Full milestone completion remains pending until Docker/Linux validation succeeds in the target environment.
+Milestone 4 adds the Hadoop user-history implementation and fixture format.
 
 Rules:
 
@@ -79,9 +79,31 @@ Example:
 102	1:3,2:5
 ```
 
-## Planned Hadoop Item-Pair Statistics Format
+## Implemented Hadoop Item-Pair Statistics Format
 
-The item-pair statistics format will be defined in Milestone 5.
+Milestone 5 adds the Hadoop item-pair statistics implementation and fixture format.
+
+```text
+movieIdA,movieIdB<TAB>commonUsers,sumXY,sumX2,sumY2
+```
+
+Rules:
+
+- `movieIdA` and `movieIdB` are positive integer movie IDs.
+- `movieIdA < movieIdB`; self-pairs and reversed duplicate pairs are not written.
+- `commonUsers` is the number of users who rated both movies.
+- `sumXY` is the sum of `rating(user, movieIdA) * rating(user, movieIdB)` over common users.
+- `sumX2` is the sum of squared ratings for `movieIdA` over common users.
+- `sumY2` is the sum of squared ratings for `movieIdB` over common users.
+- With one reducer, pair keys are sorted numerically by `movieIdA`, then `movieIdB`.
+- There is no header row.
+
+Example:
+
+```text
+1,2	3,28,38,42
+1,3	2,30,20,50
+```
 
 ## Planned Hadoop Similarity Format
 
