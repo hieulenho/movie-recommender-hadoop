@@ -39,6 +39,11 @@
 - Evaluation metric formulas must be documented and covered by tests.
 - Missing predictions in offline evaluation must be reported and must not be silently imputed, clipped, or treated as score zero.
 - Evaluation JSON outputs must reject invalid floating-point values and must not emit NaN or Infinity.
+- Docker local-mode benchmark timings must not be interpreted as multi-node cluster scaling.
+- Benchmark result schemas should remain stable unless a later milestone explicitly documents a versioned schema change.
+- Synthetic benchmark datasets and synthetic benchmark results must be clearly labeled as synthetic.
+- Runtime variation must be reported honestly; do not make statistical claims from a single repetition.
+- Do not invent unavailable Hadoop counters, HDFS byte counts, shuffle byte counts, or scheduler metrics.
 - Do not silently change architecture.
 - Do not run destructive Git commands.
 - Do not create Git commits unless explicitly requested.

@@ -129,4 +129,4 @@ The runner writes artifacts under `target/offline-evaluation/`:
 - No web interface.
 - No Hadoop daemons are started; validation uses Hadoop local mode inside Docker.
 
-Milestone 10 is the next milestone and will cover scalability and performance experiments.
+Milestone 10 adds scalability and performance benchmark tooling around this local-mode evaluation path. See `docs/scalability_experiments.md`.

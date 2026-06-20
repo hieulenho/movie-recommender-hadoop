@@ -54,6 +54,7 @@ data/processed/*
 results/*
 !results/.gitkeep
 results/evaluation/
+results/scalability/
 
 # Generated Hadoop local output
 hadoop-smoke-output/
@@ -74,6 +75,14 @@ hadoop-recommendation-scoring-output/
 top-k-recommendation-output/
 hadoop-top-k-recommendation-output/
 offline-evaluation-output/
+
+# Generated scalability benchmark artifacts
+target/scalability-benchmark/
+target/scalability-data/
+scalability-benchmark-output/
+scalability-data/
+benchmark-results/
+benchmark-logs/
 
 # Temporary files
 *.tmp

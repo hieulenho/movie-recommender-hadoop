@@ -11,7 +11,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
 - Maven provides the Java build layer for compiling, testing, packaging, and running local Hadoop smoke checks.
 - Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics, `ItemSimilarityPipeline` is implemented for directed similarity and Top-L neighbor retention, `RecommendationScoringPipeline` is implemented for raw user-candidate score calculation, and `TopKRecommendationJob` is implemented for watched-item filtering and final Top-K recommendation lists.
-- Python scripts support preprocessing, local Item-CF reference validation, deterministic train/test splitting, offline evaluation, and future plotting.
+- Python scripts support preprocessing, local Item-CF reference validation, deterministic train/test splitting, offline evaluation, reproducible benchmark orchestration, and future plotting.
 - An optional demo application may load precomputed recommendation outputs for display.
 
 ## Implemented And Planned Data Flow
@@ -30,6 +30,7 @@ flowchart TD
     I --> J[Offline Evaluator Implemented]
     H --> J
     T --> J
+    J --> K[Benchmark Metrics And Summary Implemented]
 ```
 
 The held-out test ratings bypass user-history construction, item-pair statistics, similarity, scoring, and Top-K generation. They are read only by the offline evaluator after train-only Hadoop recommendation outputs have been produced.
@@ -123,3 +124,19 @@ normalized ratings
 The evaluator checks that train/test overlap is zero and that final recommendations do not contain train-watched movies. Raw prediction metrics are MAE, RMSE, and prediction coverage. Top-K metrics are Precision@K, Recall@K, Hit Rate@K, NDCG@K, and MRR@K over ranking-eligible users.
 
 This stage does not run scalability experiments, tune hyperparameters, add a web interface, or start Hadoop daemons.
+
+## Scalability Benchmark Stage
+
+Milestone 10 adds reproducible benchmark orchestration around the implemented offline evaluation path:
+
+```text
+normalized or synthetic ratings
+-> time-aware split
+-> train-only Hadoop pipeline
+-> offline evaluation
+-> benchmark metrics and summary
+```
+
+The benchmark runner uses the existing Java Hadoop jobs and evaluation scripts. It records dataset statistics, per-stage runtime, row counts, byte counts, evaluation metrics, manifests, logs, and summary CSV/Markdown files.
+
+The core recommendation pipeline is unchanged. The benchmark measures Linux Docker Hadoop local-mode behavior only; it does not start Hadoop daemons or measure a multi-node cluster.
