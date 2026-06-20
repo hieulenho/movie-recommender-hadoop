@@ -34,6 +34,11 @@
 - Docker integration validation on Windows should compare committed fixture output against expected files when a deterministic expected output exists.
 - Item-pair fixture outputs should remain small enough to verify manually and compare against the Python Item-CF reference semantics.
 - Later Hadoop outputs should be checked against committed expected fixtures and, where applicable, the Python Item-CF reference on small inputs.
+- Offline train/test splitting must be deterministic and documented, including the equal-date movie-ID tie-break rule.
+- Hadoop model-building stages must never receive held-out test data; train/test leakage is a fatal evaluation error.
+- Evaluation metric formulas must be documented and covered by tests.
+- Missing predictions in offline evaluation must be reported and must not be silently imputed, clipped, or treated as score zero.
+- Evaluation JSON outputs must reject invalid floating-point values and must not emit NaN or Infinity.
 - Do not silently change architecture.
 - Do not run destructive Git commands.
 - Do not create Git commits unless explicitly requested.

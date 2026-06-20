@@ -119,7 +119,7 @@ The smoke job does not use Netflix data. No raw dataset is downloaded or committ
 - This document describes the environment smoke job, not the recommender-specific jobs.
 - No HDFS or YARN daemons are started.
 - No pseudo-distributed, multi-node, or Docker Compose Hadoop cluster is configured.
-- No train/test split or evaluation metric is implemented.
+- The train/test split and offline evaluation workflow is implemented separately in Milestone 9.
 - No web interface or database is added.
 
-The next Hadoop algorithm milestone after final Top-K recommendations is Milestone 9: train/test split and recommendation evaluation.
+The next Hadoop algorithm milestone after offline evaluation is Milestone 10: scalability and performance experiments.

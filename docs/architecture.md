@@ -11,7 +11,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
 - Maven provides the Java build layer for compiling, testing, packaging, and running local Hadoop smoke checks.
 - Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics, `ItemSimilarityPipeline` is implemented for directed similarity and Top-L neighbor retention, `RecommendationScoringPipeline` is implemented for raw user-candidate score calculation, and `TopKRecommendationJob` is implemented for watched-item filtering and final Top-K recommendation lists.
-- Python scripts will support preprocessing, local Item-CF reference validation, evaluation, and plotting.
+- Python scripts support preprocessing, local Item-CF reference validation, deterministic train/test splitting, offline evaluation, and future plotting.
 - An optional demo application may load precomputed recommendation outputs for display.
 
 ## Implemented And Planned Data Flow
@@ -19,15 +19,20 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 ```mermaid
 flowchart TD
     A[Raw Dataset] --> B[Preprocessing]
-    B --> C[HDFS]
-    C --> D[User History Job Implemented]
-    D --> E[Pair Statistics Job Implemented]
-    E --> F[Item Similarity and Top-L Implemented]
-    F --> G[Recommendation Scoring Implemented]
-    G --> H[Watched Filtering Implemented]
-    H --> I[Final Top-K Recommendations Implemented]
-    I --> J[Evaluation Planned]
+    B --> C[Time-Aware Train/Test Split Implemented]
+    C --> D[Train Ratings Only]
+    C --> T[Held-Out Test Ratings]
+    D --> E[User History Job Implemented]
+    E --> F[Pair Statistics Job Implemented]
+    F --> G[Item Similarity and Top-L Implemented]
+    G --> H[Recommendation Scoring Implemented]
+    H --> I[Watched Filtering and Top-K Implemented]
+    I --> J[Offline Evaluator Implemented]
+    H --> J
+    T --> J
 ```
+
+The held-out test ratings bypass user-history construction, item-pair statistics, similarity, scoring, and Top-K generation. They are read only by the offline evaluator after train-only Hadoop recommendation outputs have been produced.
 
 ## Batch Execution Model
 
@@ -96,3 +101,25 @@ userId<TAB>movieId:score,movieId:score,...
 ```
 
 Recommendations are ordered by score descending and numeric movie ID ascending. List position is the implicit rank. This stage does not split train/test data, compute evaluation metrics, add fallback recommendations, or join movie metadata.
+
+## Evaluation Stage
+
+Milestone 9 adds deterministic offline evaluation. It splits normalized ratings by user and time, builds all Hadoop artifacts from train data only, and evaluates held-out test ratings afterward.
+
+```text
+normalized ratings
+-> leave-one-out-by-time split
+-> train CSV
+-> UserHistoryJob
+-> ItemPairStatisticsJob
+-> ItemSimilarityPipeline
+-> RecommendationScoringPipeline
+-> TopKRecommendationJob
+-> raw predictions and Top-K recommendation files
+-> evaluator + held-out test CSV
+-> metrics JSON/CSV and per-user diagnostics
+```
+
+The evaluator checks that train/test overlap is zero and that final recommendations do not contain train-watched movies. Raw prediction metrics are MAE, RMSE, and prediction coverage. Top-K metrics are Precision@K, Recall@K, Hit Rate@K, NDCG@K, and MRR@K over ranking-eligible users.
+
+This stage does not run scalability experiments, tune hyperparameters, add a web interface, or start Hadoop daemons.
