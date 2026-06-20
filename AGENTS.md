@@ -23,6 +23,10 @@
 - Similarity computations must match the Python Item-CF reference semantics for cosine, row-normalized co-occurrence, min-common-users filtering, and Top-L ordering.
 - Floating-point computations must be tested with tolerances, and implementations must not round internally before final output serialization.
 - Similarity and recommendation ranking must use deterministic tie-breaking: score or similarity descending, then numeric movie ID ascending.
+- Recommendation scoring joins must avoid loading global user-history or similarity datasets into one JVM-wide map; use Hadoop partitioning, grouping, and reducers for scalable joins.
+- Recommendation scoring must keep intermediate numerator and denominator values as doubles without rounding before final output serialization.
+- Final floating-point Hadoop text output must use `Locale.ROOT` formatting.
+- Raw recommendation scores must remain consistent with the Python Item-CF weighted-average formula while preserving Milestone 7 semantics that watched candidates are not filtered yet.
 - Docker integration validation on Windows should compare committed fixture output against expected files when a deterministic expected output exists.
 - Item-pair fixture outputs should remain small enough to verify manually and compare against the Python Item-CF reference semantics.
 - Later Hadoop outputs should be checked against committed expected fixtures and, where applicable, the Python Item-CF reference on small inputs.

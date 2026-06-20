@@ -65,6 +65,11 @@ hadoop-item-similarity-output/
 *-item-similarity-intermediate/
 *.item-similarity-intermediate/
 .*.item-similarity-intermediate/
+recommendation-scoring-output/
+hadoop-recommendation-scoring-output/
+*-recommendation-scoring-intermediate/
+*.recommendation-scoring-intermediate/
+.*.recommendation-scoring-intermediate/
 
 # Temporary files
 *.tmp

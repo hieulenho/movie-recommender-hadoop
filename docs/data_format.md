@@ -132,17 +132,36 @@ Example:
 3,1	0.2500000000,2
 ```
 
-## Planned Hadoop Prediction Format
+## Implemented Hadoop Raw Prediction Format
 
 ```text
-userId,movieId,predictedScore
+userId,movieId<TAB>score
 ```
 
-## Planned Hadoop Final Output
+Milestone 7 adds the Hadoop recommendation scoring implementation and fixture format.
+
+Rules:
+
+- Rows are raw user-candidate prediction scores.
+- Scores are calculated from retained directed Top-L similarities and user ratings.
+- Scores are written with exactly 10 digits after the decimal point.
+- With one reducer, rows are sorted numerically by user ID, then movie ID.
+- Watched movies may remain in this raw output by design.
+- There is no header row.
+
+Example:
+
+```text
+101,3	3.8000000000
+```
+
+## Planned Hadoop Final Top-K Recommendation Output
 
 ```text
 userId<TAB>movieId:score,movieId:score
 ```
+
+The final Top-K recommendation format is planned for Milestone 8 after watched-item filtering and ranking.
 
 ## Environment Smoke Output
 

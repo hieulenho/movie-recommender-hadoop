@@ -10,7 +10,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
 - Maven provides the Java build layer for compiling, testing, packaging, and running local Hadoop smoke checks.
-- Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics, and `ItemSimilarityPipeline` is implemented for directed similarity and Top-L neighbor retention. Prediction, watched-item filtering, and Top-K selection remain planned.
+- Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics, `ItemSimilarityPipeline` is implemented for directed similarity and Top-L neighbor retention, and `RecommendationScoringPipeline` is implemented for raw user-candidate score calculation. Watched-item filtering and Top-K selection remain planned.
 - Python scripts will support preprocessing, local Item-CF reference validation, evaluation, and plotting.
 - An optional demo application may load precomputed recommendation outputs for display.
 
@@ -23,8 +23,8 @@ flowchart TD
     C --> D[User History Job Implemented]
     D --> E[Pair Statistics Job Implemented]
     E --> F[Item Similarity and Top-L Implemented]
-    F --> G[Prediction Job Planned]
-    G --> H[Top-K Job]
+    F --> G[Recommendation Scoring Implemented]
+    G --> H[Watched Filtering and Top-K Planned]
     H --> I[Recommendations]
     I --> J[Evaluation and Demo]
 ```
@@ -72,3 +72,15 @@ sourceMovieId,neighborMovieId<TAB>similarity,commonUsers
 Cosine uses `sumXY / sqrt(sumX2 * sumY2)` and produces equal values in both directions. Co-occurrence uses source-specific common-user denominators before Top-L truncation, so directed values can be asymmetric. The final reducer orders retained neighbors by similarity descending and numeric neighbor movie ID ascending.
 
 This stage does not score recommendations, filter watched movies, produce Top-K recommendation rows, split train/test data, or calculate evaluation metrics.
+
+## Recommendation Scoring Stage
+
+Milestone 7 adds `RecommendationScoringPipeline`. It joins user-history rows with retained directed Top-L similarity rows through a secondary-sort reduce-side join keyed by source movie ID. The join reducer stores only the bounded neighbor list for one source movie and streams user rating records to emit typed additive contributions.
+
+The aggregation stage combines contribution numerators, denominators, and contributing item counts for each `userId,movieId` key, then writes:
+
+```text
+userId,movieId<TAB>score
+```
+
+Scores use the Item-CF weighted-average formula and are formatted with exactly 10 decimal places. Watched movies remain in this raw output by design; filtering and Top-K ranking remain planned for the next milestone.
