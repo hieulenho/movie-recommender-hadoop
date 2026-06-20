@@ -10,7 +10,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
 - Maven provides the Java build layer for compiling, testing, packaging, and running local Hadoop smoke checks.
-- Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics, `ItemSimilarityPipeline` is implemented for directed similarity and Top-L neighbor retention, and `RecommendationScoringPipeline` is implemented for raw user-candidate score calculation. Watched-item filtering and Top-K selection remain planned.
+- Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics, `ItemSimilarityPipeline` is implemented for directed similarity and Top-L neighbor retention, `RecommendationScoringPipeline` is implemented for raw user-candidate score calculation, and `TopKRecommendationJob` is implemented for watched-item filtering and final Top-K recommendation lists.
 - Python scripts will support preprocessing, local Item-CF reference validation, evaluation, and plotting.
 - An optional demo application may load precomputed recommendation outputs for display.
 
@@ -24,9 +24,9 @@ flowchart TD
     D --> E[Pair Statistics Job Implemented]
     E --> F[Item Similarity and Top-L Implemented]
     F --> G[Recommendation Scoring Implemented]
-    G --> H[Watched Filtering and Top-K Planned]
-    H --> I[Recommendations]
-    I --> J[Evaluation and Demo]
+    G --> H[Watched Filtering Implemented]
+    H --> I[Final Top-K Recommendations Implemented]
+    I --> J[Evaluation Planned]
 ```
 
 ## Batch Execution Model
@@ -83,4 +83,16 @@ The aggregation stage combines contribution numerators, denominators, and contri
 userId,movieId<TAB>score
 ```
 
-Scores use the Item-CF weighted-average formula and are formatted with exactly 10 decimal places. Watched movies remain in this raw output by design; filtering and Top-K ranking remain planned for the next milestone.
+Scores use the Item-CF weighted-average formula and are formatted with exactly 10 decimal places. Watched movies remain in this raw output by design; the next Hadoop stage consumes these raw rows and removes watched candidates.
+
+## Watched Filtering And Top-K Stage
+
+Milestone 8 adds `TopKRecommendationJob`. It joins user-history rows with raw prediction rows through a secondary-sort reduce-side anti-join keyed by user ID. The reducer reads one user's watched history first, streams that user's raw predictions, filters watched candidates, handles duplicate prediction rows, and keeps a bounded Top-K queue.
+
+The final stage writes precomputed recommendation lists:
+
+```text
+userId<TAB>movieId:score,movieId:score,...
+```
+
+Recommendations are ordered by score descending and numeric movie ID ascending. List position is the implicit rank. This stage does not split train/test data, compute evaluation metrics, add fallback recommendations, or join movie metadata.

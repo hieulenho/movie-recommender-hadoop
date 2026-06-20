@@ -78,7 +78,7 @@ Only retained Top-L relations from rated source item `j` to unseen candidate `c`
 
 Movies already rated by the user are never recommended. Users with no valid unseen candidates may have no output rows. The implementation does not generate fallback popular-movie recommendations.
 
-The Hadoop Milestone 7 raw scoring pipeline intentionally stops before this filtering step, so its `userId,movieId<TAB>score` output may still include movies already present in the user's history. Hadoop watched-item filtering is deferred to Milestone 8.
+The Hadoop Milestone 7 raw scoring pipeline intentionally stops before this filtering step, so its `userId,movieId<TAB>score` output may still include movies already present in the user's history. Hadoop watched-item filtering and Top-K serialization are implemented by Milestone 8.
 
 ## Top-K Recommendations
 

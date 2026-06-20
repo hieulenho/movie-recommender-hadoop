@@ -6,7 +6,7 @@ Milestone 3 establishes the Java and Maven foundation for future Hadoop MapReduc
 
 The smoke job is only an environment check. It is not part of the recommender algorithm.
 
-Milestone 4 builds on this environment with the user-history MapReduce job documented in `docs/user_history_job.md`. Milestone 5 adds item-pair statistics documented in `docs/item_pair_statistics_job.md`. Milestone 6 adds item similarity and Top-L neighbors documented in `docs/item_similarity_job.md`. Milestone 7 adds raw recommendation scoring documented in `docs/recommendation_scoring_job.md`.
+Milestone 4 builds on this environment with the user-history MapReduce job documented in `docs/user_history_job.md`. Milestone 5 adds item-pair statistics documented in `docs/item_pair_statistics_job.md`. Milestone 6 adds item similarity and Top-L neighbors documented in `docs/item_similarity_job.md`. Milestone 7 adds raw recommendation scoring documented in `docs/recommendation_scoring_job.md`. Milestone 8 adds watched-item filtering and Top-K output documented in `docs/top_k_recommendation_job.md`.
 
 ## Requirements
 
@@ -88,6 +88,12 @@ Run the Milestone 7 scoring fixture and expected-output comparison in Docker:
 powershell -ExecutionPolicy Bypass -File scripts/run_recommendation_scoring_docker.ps1
 ```
 
+Run the Milestone 8 Top-K fixture and expected-output comparison in Docker:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_top_k_recommendations_docker.ps1 -TopK 2
+```
+
 ## Windows Notes
 
 Do not download `winutils.exe`, do not add unofficial Hadoop binaries, and do not hard-code `HADOOP_HOME`. A harmless Hadoop native-library warning is different from a failed job or failed test. If local Hadoop execution fails on Windows because of platform-native behavior, preserve the real integration test and validate in the Docker Linux environment when available.
@@ -116,4 +122,4 @@ The smoke job does not use Netflix data. No raw dataset is downloaded or committ
 - No train/test split or evaluation metric is implemented.
 - No web interface or database is added.
 
-The next Hadoop algorithm milestone after raw recommendation scoring is Milestone 8: watched-item filtering and Top-K ranking.
+The next Hadoop algorithm milestone after final Top-K recommendations is Milestone 9: train/test split and recommendation evaluation.

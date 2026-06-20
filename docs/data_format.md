@@ -155,13 +155,35 @@ Example:
 101,3	3.8000000000
 ```
 
-## Planned Hadoop Final Top-K Recommendation Output
+## Implemented Hadoop Final Top-K Recommendation Output
 
 ```text
 userId<TAB>movieId:score,movieId:score
 ```
 
-The final Top-K recommendation format is planned for Milestone 8 after watched-item filtering and ranking.
+Milestone 8 adds watched-item filtering and deterministic Top-K recommendation-list serialization.
+
+Rules:
+
+- One row is written per user with at least one unseen recommendation.
+- Watched movie IDs are excluded.
+- Each recommendation entry is `movieId:score`.
+- Entries are comma-separated with no trailing comma.
+- Scores are written with exactly 10 digits after the decimal point.
+- Recommendation list position is the implicit rank starting at `1`.
+- Entries are ordered by score descending, then numeric movie ID ascending.
+- With one reducer, user IDs are sorted numerically.
+- There is no header row.
+
+Example:
+
+```text
+101	3:3.8000000000,4:3.0000000000
+```
+
+## Planned Evaluation Output Formats
+
+Train/test split and evaluation metric output formats are planned for Milestone 9.
 
 ## Environment Smoke Output
 
