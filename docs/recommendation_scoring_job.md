@@ -54,7 +54,7 @@ key   = UserMovieWritable(u,c)
 value = ScoreContributionWritable(s*r, abs(s), 1)
 ```
 
-Watched candidates are intentionally retained in this raw output. Filtering them is Milestone 8.
+Watched candidates are intentionally retained in this raw output. The Milestone 8 Top-K job filters them.
 
 ## Intermediate Output
 
@@ -164,11 +164,11 @@ denominator = abs(0.5) + abs(0.7) = 1.2
 score = 4.5833333333
 ```
 
-The expected output intentionally includes watched candidates such as `101,1`, `101,2`, `102,2`, and `102,3`. This confirms that watched-item filtering is deferred.
+The expected output intentionally includes watched candidates such as `101,1`, `101,2`, `102,2`, and `102,3`. This confirms that watched-item filtering is handled by the downstream Top-K job rather than by raw scoring.
 
 ## Relationship To The Python Reference
 
-The weighted-average formula matches `scripts/itemcf_reference.py`, but Milestone 7 intentionally differs from the reference recommendation writer by keeping watched candidates in raw scoring output. The Python reference removes watched movies when producing Top-K recommendations; that behavior belongs to the later Hadoop filtering and ranking milestone.
+The weighted-average formula matches `scripts/itemcf_reference.py`, but Milestone 7 intentionally differs from the reference recommendation writer by keeping watched candidates in raw scoring output. The Python reference removes watched movies when producing Top-K recommendations; the Hadoop implementation performs that filtering in Milestone 8.
 
 ## Limitations
 
@@ -180,4 +180,4 @@ The weighted-average formula matches `scripts/itemcf_reference.py`, but Mileston
 - Hadoop local mode is not HDFS, YARN, pseudo-distributed mode, or a cluster.
 - Native Windows Hadoop execution remains unsupported; Docker/Linux is the validation target.
 
-The next milestone is Milestone 8: watched-item filtering and Top-K ranking.
+The downstream Hadoop stage is Milestone 8: watched-item filtering and Top-K ranking.

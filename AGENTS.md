@@ -27,6 +27,10 @@
 - Recommendation scoring must keep intermediate numerator and denominator values as doubles without rounding before final output serialization.
 - Final floating-point Hadoop text output must use `Locale.ROOT` formatting.
 - Raw recommendation scores must remain consistent with the Python Item-CF weighted-average formula while preserving Milestone 7 semantics that watched candidates are not filtered yet.
+- Final recommendation output must exclude watched movie IDs.
+- Top-K recommendation selection must use bounded per-user data structures rather than retaining unbounded candidate lists.
+- Final recommendation ordering must be deterministic: score descending, then numeric movie ID ascending.
+- Final recommendation score formatting must use `Locale.ROOT`.
 - Docker integration validation on Windows should compare committed fixture output against expected files when a deterministic expected output exists.
 - Item-pair fixture outputs should remain small enough to verify manually and compare against the Python Item-CF reference semantics.
 - Later Hadoop outputs should be checked against committed expected fixtures and, where applicable, the Python Item-CF reference on small inputs.

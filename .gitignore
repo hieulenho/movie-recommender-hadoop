@@ -70,6 +70,8 @@ hadoop-recommendation-scoring-output/
 *-recommendation-scoring-intermediate/
 *.recommendation-scoring-intermediate/
 .*.recommendation-scoring-intermediate/
+top-k-recommendation-output/
+hadoop-top-k-recommendation-output/
 
 # Temporary files
 *.tmp

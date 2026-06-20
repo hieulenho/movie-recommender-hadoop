@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 7 - Recommendation Score Calculation Hadoop MapReduce Pipeline completed**.
+Current status: **Milestone 8 - Watched-Item Filtering and Top-K Recommendation Hadoop Job completed**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, and raw Recommendation Scoring MapReduce pipeline are implemented. Watched-item filtering, Top-K recommendation, train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, and final watched-item filtering/Top-K recommendation job are implemented. Train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
 
 ## Main Objectives
 
@@ -54,6 +54,7 @@ raw data
 |   |-- item_pair_statistics_job.md
 |   |-- item_similarity_job.md
 |   |-- recommendation_scoring_job.md
+|   |-- top_k_recommendation_job.md
 |   |-- hadoop_environment.md
 |   `-- references.md
 |-- data/
@@ -243,4 +244,26 @@ The output format is:
 userId,movieId<TAB>score
 ```
 
-Scores are weighted averages over retained directed Top-L similarities and are formatted with exactly 10 digits after the decimal point. Raw prediction rows may include movies the user has already rated; watched-item filtering and Top-K ranking are deferred to Milestone 8.
+Scores are weighted averages over retained directed Top-L similarities and are formatted with exactly 10 digits after the decimal point. Raw prediction rows may include movies the user has already rated; the Milestone 8 Top-K job consumes them and removes watched movies.
+
+## Top-K Recommendation Hadoop Job Usage
+
+Run fixture watched-item filtering and Top-K recommendation output in Linux local mode:
+
+```bash
+bash scripts/run_top_k_recommendations.sh
+```
+
+Run the same validation from Windows through Docker:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_top_k_recommendations_docker.ps1 -TopK 2
+```
+
+The final offline output format is:
+
+```text
+userId<TAB>movieId:score,movieId:score,...
+```
+
+Watched movies are removed, each user has at most Top-K recommendations, and ties are broken by movie ID ascending. The output is precomputed for downstream evaluation or display. Evaluation metrics are planned for Milestone 9 and are not implemented yet.
