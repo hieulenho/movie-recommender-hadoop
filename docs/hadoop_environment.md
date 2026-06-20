@@ -6,6 +6,8 @@ Milestone 3 establishes the Java and Maven foundation for future Hadoop MapReduc
 
 The smoke job is only an environment check. It is not part of the recommender algorithm.
 
+Milestone 4 builds on this environment with the user-history MapReduce job documented in `docs/user_history_job.md`.
+
 ## Requirements
 
 - Java 17 for compiling and running the Maven project.
@@ -102,10 +104,10 @@ The smoke job does not use Netflix data. No raw dataset is downloaded or committ
 
 ## Limitations
 
-- No recommender-specific Hadoop job is implemented.
+- This document describes the environment smoke job, not the recommender-specific jobs.
 - No HDFS or YARN daemons are started.
 - No pseudo-distributed, multi-node, or Docker Compose Hadoop cluster is configured.
 - No train/test split or evaluation metric is implemented.
 - No web interface or database is added.
 
-The next milestone is Milestone 4: the user-history MapReduce job.
+The next Hadoop algorithm milestone after user histories is Milestone 5: item-pair statistics.

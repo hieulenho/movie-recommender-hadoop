@@ -51,11 +51,37 @@ userId,rank,movieId,score
 
 Rows are ordered by user ID ascending and rank ascending. Scores are written with 12 decimal places.
 
-## Planned User-History Format
+## User-History Format
 
 ```text
 userId<TAB>movieId:rating,movieId:rating
 ```
+
+Milestone 4 adds the Hadoop user-history implementation and fixture format. Full milestone completion remains pending until Docker/Linux validation succeeds in the target environment.
+
+Rules:
+
+- One output record is written per user.
+- The key is the numeric user ID.
+- The key and value are separated by one tab.
+- Movie entries are separated by commas.
+- Each movie entry is `movieId:rating`.
+- Movie IDs are sorted numerically ascending within each history.
+- Ratings are written as integers.
+- Dates are used for duplicate validation but are not written to the output.
+- Exact duplicate normalized records are ignored after the first occurrence.
+- Conflicting duplicate user/movie records fail the job.
+
+Example:
+
+```text
+101	1:4,3:5
+102	1:3,2:5
+```
+
+## Planned Hadoop Item-Pair Statistics Format
+
+The item-pair statistics format will be defined in Milestone 5.
 
 ## Planned Hadoop Similarity Format
 

@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 3 - Maven, Java, and Hadoop Local-Mode Environment in progress**.
+Current status: **Milestone 4 - User History Hadoop MapReduce Job implemented; full Docker/Linux validation pending**.
 
-The Netflix raw rating preprocessor and local Python Item-CF reference implementation are implemented. Milestone 3 adds a minimal Hadoop local-mode smoke job for environment validation only. Recommender-specific Hadoop jobs, MapReduce algorithms, a web UI, and evaluation metrics are not implemented yet.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, and User History MapReduce job are implemented. Item-pair statistics, similarity, recommendation scoring, watched-item filtering, Top-K recommendation, train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
 
 ## Main Objectives
 
@@ -50,6 +50,7 @@ raw data
 |   |-- data_format.md
 |   |-- preprocessing.md
 |   |-- itemcf_reference.md
+|   |-- user_history_job.md
 |   |-- hadoop_environment.md
 |   `-- references.md
 |-- data/
@@ -142,6 +143,30 @@ Optional Docker validation:
 powershell -ExecutionPolicy Bypass -File scripts/test_hadoop_maven_docker.ps1
 ```
 
-Hadoop local mode is not a distributed cluster. HDFS and YARN are not started in this milestone.
+Native Windows Hadoop local-mode execution can require unsupported Hadoop Windows binaries. Do not add `winutils.exe`, do not hard-code `HADOOP_HOME`, and use the Docker/Linux validation path for real local-mode Hadoop integration tests on Windows.
 
-Additional recommender-specific Hadoop execution and evaluation instructions will be added in later milestones.
+Hadoop local mode is not a distributed cluster. HDFS and YARN are not started in this project environment.
+
+## User History Hadoop Job Usage
+
+Run the fixture user-history job in Linux local mode:
+
+```bash
+bash scripts/run_user_history.sh
+```
+
+Run the same validation from Windows through Docker:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_user_history_docker.ps1
+```
+
+The output format is:
+
+```text
+userId<TAB>movieId:rating,movieId:rating,...
+```
+
+Movie IDs are sorted numerically within each user history. Exact duplicate normalized rating records are ignored, while conflicting duplicate user/movie rows fail the job.
+
+Item-pair statistics and similarity jobs are planned for later milestones and are not part of this implementation.

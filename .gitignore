@@ -54,8 +54,10 @@ data/processed/*
 results/*
 !results/.gitkeep
 
-# Generated Hadoop smoke output
+# Generated Hadoop local output
 hadoop-smoke-output/
+user-history-output/
+hadoop-user-history-output/
 
 # Temporary files
 *.tmp

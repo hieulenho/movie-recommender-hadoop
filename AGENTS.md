@@ -14,7 +14,11 @@
 - Keep Java tests under `src/test/java`.
 - Keep Python utilities under `scripts` unless a later architecture decision changes this.
 - Do not add unofficial Hadoop Windows binaries such as `winutils.exe`.
-- Future recommender Hadoop outputs should be checked against the Python Item-CF reference on small fixtures.
+- New Hadoop jobs must include parser/unit tests and real Hadoop local-mode integration tests.
+- On Windows, validate Hadoop jobs in the Docker/Linux workflow rather than relying on native Hadoop execution.
+- Do not hard-code `HADOOP_HOME` or machine-specific Hadoop paths.
+- Hadoop reducer output should be deterministic where practical, including sorted keys or sorted values when the format depends on order.
+- Later Hadoop outputs should be checked against committed expected fixtures and, where applicable, the Python Item-CF reference on small inputs.
 - Do not silently change architecture.
 - Do not run destructive Git commands.
 - Do not create Git commits unless explicitly requested.
