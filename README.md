@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 4 - User History Hadoop MapReduce Job implemented; full Docker/Linux validation pending**.
+Current status: **Milestone 5 - Item-Pair Statistics Hadoop MapReduce Job completed**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, and User History MapReduce job are implemented. Item-pair statistics, similarity, recommendation scoring, watched-item filtering, Top-K recommendation, train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, and Item-Pair Statistics MapReduce job are implemented. Similarity, recommendation scoring, watched-item filtering, Top-K recommendation, train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
 
 ## Main Objectives
 
@@ -51,6 +51,7 @@ raw data
 |   |-- preprocessing.md
 |   |-- itemcf_reference.md
 |   |-- user_history_job.md
+|   |-- item_pair_statistics_job.md
 |   |-- hadoop_environment.md
 |   `-- references.md
 |-- data/
@@ -169,4 +170,26 @@ userId<TAB>movieId:rating,movieId:rating,...
 
 Movie IDs are sorted numerically within each user history. Exact duplicate normalized rating records are ignored, while conflicting duplicate user/movie rows fail the job.
 
-Item-pair statistics and similarity jobs are planned for later milestones and are not part of this implementation.
+## Item-Pair Statistics Hadoop Job Usage
+
+Run the fixture item-pair statistics job in Linux local mode:
+
+```bash
+bash scripts/run_item_pair_stats.sh
+```
+
+Run the same validation from Windows through Docker:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_item_pair_stats_docker.ps1
+```
+
+The output format is:
+
+```text
+movieIdA,movieIdB<TAB>commonUsers,sumXY,sumX2,sumY2
+```
+
+Movie pairs are unordered with `movieIdA < movieIdB`. The statistics match the Python Item-CF reference definitions and are intended for the later similarity milestone.
+
+Similarity and recommendation jobs are planned for later milestones and are not part of this implementation.

@@ -10,7 +10,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
 - Maven provides the Java build layer for compiling, testing, packaging, and running local Hadoop smoke checks.
-- Java MapReduce jobs perform the Hadoop computations. The first recommender-specific stage, `UserHistoryJob`, is implemented for user-history construction. Item-pair statistics, similarity calculation, prediction, watched-item filtering, and Top-K selection remain planned.
+- Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, and `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics. Similarity calculation, prediction, watched-item filtering, and Top-K selection remain planned.
 - Python scripts will support preprocessing, local Item-CF reference validation, evaluation, and plotting.
 - An optional demo application may load precomputed recommendation outputs for display.
 
@@ -21,8 +21,8 @@ flowchart TD
     A[Raw Dataset] --> B[Preprocessing]
     B --> C[HDFS]
     C --> D[User History Job Implemented]
-    D --> E[Pair Statistics Job Planned]
-    E --> F[Similarity Job]
+    D --> E[Pair Statistics Job Implemented]
+    E --> F[Similarity Job Planned]
     F --> G[Prediction Job]
     G --> H[Top-K Job]
     H --> I[Recommendations]
@@ -46,3 +46,15 @@ Milestone 3 adds `LineCountJob`, a minimal Hadoop local-mode smoke job that coun
 Milestone 4 adds `UserHistoryJob`, the first recommender-specific Hadoop stage. It reads normalized ratings, validates rows with `NormalizedRating`, skips exact header rows, groups ratings by user, writes movie histories sorted by movie ID, ignores exact duplicate normalized records, and fails on conflicting duplicate user/movie records.
 
 This stage produces the documented user-history format for Milestone 5. It does not generate item pairs, co-occurrence counts, cosine similarity, neighbors, predictions, recommendations, or evaluation metrics.
+
+## Item-Pair Statistics Stage
+
+Milestone 5 adds `ItemPairStatisticsJob`. It reads user-history rows, validates them with `UserHistoryRecord`, emits unordered item-pair contributions for each user, combines additive partials, and writes:
+
+```text
+movieIdA,movieIdB<TAB>commonUsers,sumXY,sumX2,sumY2
+```
+
+The custom `ItemPairWritable` compares numeric movie IDs, which keeps one-reducer fixture output deterministic and avoids lexicographic ordering mistakes such as sorting `10` before `2`. The aggregate fields match the Python Item-CF reference pair-statistics semantics.
+
+This stage does not calculate similarity values, retain Top-L neighbors, score recommendations, filter watched movies, produce Top-K results, or evaluate accuracy metrics.
