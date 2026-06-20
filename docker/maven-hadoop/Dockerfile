@@ -7,9 +7,10 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY pom.xml ./
+COPY config ./config
 COPY src ./src
 COPY scripts ./scripts
-COPY tests/fixtures ./tests/fixtures
+COPY tests ./tests
 
 RUN mvn -B clean test package
 RUN bash scripts/run_hadoop_smoke.sh

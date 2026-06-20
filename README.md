@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 9 - Time-Aware Train/Test Split and Offline Recommendation Evaluation completed**.
+Current status: **Milestone 10 - Reproducible Scalability and Performance Experiments in progress**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, and deterministic offline evaluation workflow are implemented. Hadoop scalability experiments, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, and reproducible scalability benchmark tooling are implemented. Spark, a web UI, and Hadoop cluster deployment are not implemented.
 
 ## Main Objectives
 
@@ -57,6 +57,7 @@ raw data
 |   |-- recommendation_scoring_job.md
 |   |-- top_k_recommendation_job.md
 |   |-- offline_evaluation.md
+|   |-- scalability_experiments.md
 |   |-- hadoop_environment.md
 |   `-- references.md
 |-- data/
@@ -288,4 +289,30 @@ powershell -ExecutionPolicy Bypass -File scripts/run_offline_evaluation_docker.p
 
 Generated evaluation artifacts include `split_stats.json`, `metrics.json`, `metrics.csv`, and `per_user_metrics.csv` under `target/offline-evaluation/`. Principal metrics include prediction coverage, MAE, RMSE, Precision@K, Recall@K, Hit Rate@K, NDCG@K, and MRR@K. Missing predictions are reported rather than imputed.
 
-The test split is never passed to User History, Item-Pair Statistics, Similarity, Scoring, or Top-K generation. Milestone 10 will measure Hadoop scalability and performance; those experiments are intentionally not included in Milestone 9.
+The test split is never passed to User History, Item-Pair Statistics, Similarity, Scoring, or Top-K generation. Milestone 10 adds a separate benchmark workflow around this evaluation path without changing the core recommender pipeline.
+
+## Scalability Benchmark Usage
+
+Milestone 10 benchmarks the real Milestone 9 train-only Hadoop and evaluation workflow in Linux Docker local mode. Smoke is the normal validation profile:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_docker.ps1 -Profile smoke
+```
+
+The smoke profile runs three increasing synthetic dataset sizes, approximately 250, 1000, and 3000 ratings, with both cosine and row-normalized co-occurrence similarity.
+
+Run the standard profile for longer report-oriented local measurements:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_docker.ps1 -Profile standard
+```
+
+The extended profile may take significantly longer and can require more memory:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_docker.ps1 -Profile extended
+```
+
+Generated benchmark artifacts are written under `target/scalability-benchmark/` by default and remain ignored by Git. Principal outputs include `benchmark_results.csv`, `benchmark_results.json`, `benchmark_summary.md`, `method_comparison.csv`, `size_scaling.csv`, per-run manifests, stage metrics, split stats, evaluation metrics, and logs.
+
+These results are single-container Hadoop local-mode measurements. Multi-node cluster scaling, HDFS throughput, and YARN scheduling have not been measured.

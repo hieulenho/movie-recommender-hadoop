@@ -244,6 +244,127 @@ Empty fields are used when a held-out rating has no raw prediction, no recommend
 
 The split statistics JSON includes `split_method` set to `leave-one-out-by-time`, `holdout_per_user` set to `1`, duplicate counts, user/item counts, and train/test row counts. The invariant `train_rows + test_rows = accepted_ratings` must hold.
 
+## Synthetic Dataset Statistics JSON
+
+Milestone 10 synthetic benchmark datasets write readable UTF-8 JSON with `allow_nan=False`.
+
+Required fields include:
+
+- `dataset_type`: always `synthetic`
+- `seed`
+- `users_requested`
+- `items_requested`
+- `ratings_per_user`
+- `output_rows`
+- `distinct_users`
+- `distinct_items`
+- `minimum_ratings_per_user`
+- `maximum_ratings_per_user`
+- `average_ratings_per_user`
+- `minimum_users_per_item`
+- `maximum_users_per_item`
+- `average_users_per_item`
+- `start_date`
+- `end_date`
+- `sha256`
+
+The SHA-256 value is calculated from the generated normalized CSV bytes.
+
+## Benchmark Results CSV
+
+Milestone 10 writes `benchmark_results.csv` with one row per experiment repetition. Empty fields are used for unavailable optional numeric metrics.
+
+The header is:
+
+```text
+experimentId,profile,datasetType,method,seed,users,items,ratingsPerUser,ratingsRows,trainRows,testRows,minCommonUsers,topL,topK,relevanceThreshold,reducers,repetition,datasetGenerationSeconds,splitSeconds,userHistorySeconds,pairStatisticsSeconds,similaritySeconds,scoringSeconds,topKSeconds,evaluationSeconds,totalPipelineSeconds,totalRunSeconds,userHistoryRows,itemPairRows,similarityRows,rawPredictionRows,recommendationUsers,recommendationItems,ratingsInputBytes,trainBytes,userHistoryBytes,itemPairBytes,similarityBytes,rawPredictionBytes,recommendationBytes,predictionCoverage,mae,rmse,precisionAtK,recallAtK,hitRateAtK,ndcgAtK,mrrAtK,status,errorStage,errorMessage
+```
+
+Decimal values use dot decimal formatting independent of system locale.
+
+## Benchmark Results JSON
+
+`benchmark_results.json` is readable UTF-8 JSON with `allow_nan=False`.
+
+Top-level fields include:
+
+- `tool`
+- `schema_version`
+- `benchmark_metadata`
+- `environment_metadata`
+- `profile_metadata`
+- `runs`
+- `successful_run_count`
+- `failed_run_count`
+
+Environment metadata records only non-secret execution context such as OS, architecture, Java version, Maven version, Python version, Hadoop dependency version, Docker image name, Git commit, Git branch, and repository dirty state.
+
+## Run Manifest JSON
+
+Each run writes `run_manifest.json`.
+
+Required fields include:
+
+- `tool`
+- `schema_version`
+- `experiment_id`
+- `run_id`
+- `configuration`
+- `repetition`
+- `dataset_hash`
+- `status`
+- `stage_statuses`
+- `output_artifact_names`
+- `result_record`
+- `error`
+
+A completed run must explicitly contain:
+
+```json
+{
+  "status": "completed"
+}
+```
+
+File existence alone is not considered proof of completion.
+
+## Stage Metrics JSON
+
+Each run writes `stage_metrics.json` with:
+
+- `hadoop_counters`
+- `hadoop_counters_status`
+- `stages`
+- `row_counts`
+- `byte_counts`
+- `part_file_counts`
+
+Hadoop counters are recorded as unavailable unless a reliable structured source exists. The benchmark must not invent HDFS bytes, shuffle bytes, or scheduler counters.
+
+## Method Comparison CSV
+
+`method_comparison.csv` groups completed runs by profile, input size, and method.
+
+The header is:
+
+```text
+profile,ratingsRows,method,experiments,meanTotalPipelineSeconds,minTotalPipelineSeconds,maxTotalPipelineSeconds,populationStddevSeconds,meanPredictionCoverage,meanPrecisionAtK,meanRecallAtK,meanHitRateAtK,meanNdcgAtK,meanMrrAtK
+```
+
+Population standard deviation uses Python `statistics.pstdev`.
+
+## Size Scaling CSV
+
+`size_scaling.csv` records completed runs with calculated growth fields.
+
+The header is:
+
+```text
+profile,method,ratingsRows,experimentId,repetition,totalPipelineSeconds,runtimeGrowthFactor,ratingsThroughput,pairGrowthRelativeToRatings,similarityGrowthRelativeToPairs,recommendationUserCoverage
+```
+
+Zero denominators produce empty fields, not NaN or Infinity.
+
 ## Environment Smoke Output
 
 Milestone 3 includes a temporary Hadoop local-mode smoke output for environment validation only:

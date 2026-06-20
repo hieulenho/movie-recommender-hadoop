@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "name": "smoke",
+      "description": "Small Docker local-mode validation profile with three increasing synthetic dataset sizes.",
+      "experiments": [
+        {
+          "id": "smoke-cosine-250-ratings",
+          "users": 25,
+          "items": 50,
+          "ratings_per_user": 10,
+          "method": "cosine",
+          "min_common_users": 1,
+          "top_l": 10,
+          "top_k": 5,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "smoke-cooccurrence-250-ratings",
+          "users": 25,
+          "items": 50,
+          "ratings_per_user": 10,
+          "method": "cooccurrence",
+          "min_common_users": 1,
+          "top_l": 10,
+          "top_k": 5,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "smoke-cosine-1000-ratings",
+          "users": 100,
+          "items": 100,
+          "ratings_per_user": 10,
+          "method": "cosine",
+          "min_common_users": 1,
+          "top_l": 10,
+          "top_k": 5,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "smoke-cooccurrence-1000-ratings",
+          "users": 100,
+          "items": 100,
+          "ratings_per_user": 10,
+          "method": "cooccurrence",
+          "min_common_users": 1,
+          "top_l": 10,
+          "top_k": 5,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "smoke-cosine-3000-ratings",
+          "users": 200,
+          "items": 150,
+          "ratings_per_user": 15,
+          "method": "cosine",
+          "min_common_users": 1,
+          "top_l": 10,
+          "top_k": 5,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "smoke-cooccurrence-3000-ratings",
+          "users": 200,
+          "items": 150,
+          "ratings_per_user": 15,
+          "method": "cooccurrence",
+          "min_common_users": 1,
+          "top_l": 10,
+          "top_k": 5,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        }
+      ]
+    },
+    {
+      "name": "standard",
+      "description": "Moderate Docker local-mode profile for report-oriented runs. It may take substantially longer than smoke.",
+      "experiments": [
+        {
+          "id": "standard-cosine-10000-ratings",
+          "users": 500,
+          "items": 500,
+          "ratings_per_user": 20,
+          "method": "cosine",
+          "min_common_users": 1,
+          "top_l": 25,
+          "top_k": 5,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "standard-cooccurrence-10000-ratings",
+          "users": 500,
+          "items": 500,
+          "ratings_per_user": 20,
+          "method": "cooccurrence",
+          "min_common_users": 1,
+          "top_l": 25,
+          "top_k": 5,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "standard-cosine-25000-ratings",
+          "users": 1000,
+          "items": 1000,
+          "ratings_per_user": 25,
+          "method": "cosine",
+          "min_common_users": 2,
+          "top_l": 50,
+          "top_k": 10,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "standard-cooccurrence-25000-ratings",
+          "users": 1000,
+          "items": 1000,
+          "ratings_per_user": 25,
+          "method": "cooccurrence",
+          "min_common_users": 2,
+          "top_l": 50,
+          "top_k": 10,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "standard-cosine-50000-ratings",
+          "users": 2000,
+          "items": 2000,
+          "ratings_per_user": 25,
+          "method": "cosine",
+          "min_common_users": 3,
+          "top_l": 75,
+          "top_k": 10,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "standard-cooccurrence-50000-ratings",
+          "users": 2000,
+          "items": 2000,
+          "ratings_per_user": 25,
+          "method": "cooccurrence",
+          "min_common_users": 3,
+          "top_l": 75,
+          "top_k": 10,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        }
+      ]
+    },
+    {
+      "name": "extended",
+      "description": "Large Docker local-mode profile for manual runs only. Runtime and memory requirements may be high.",
+      "experiments": [
+        {
+          "id": "extended-cosine-100000-ratings",
+          "users": 5000,
+          "items": 5000,
+          "ratings_per_user": 20,
+          "method": "cosine",
+          "min_common_users": 2,
+          "top_l": 50,
+          "top_k": 10,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "extended-cooccurrence-100000-ratings",
+          "users": 5000,
+          "items": 5000,
+          "ratings_per_user": 20,
+          "method": "cooccurrence",
+          "min_common_users": 2,
+          "top_l": 50,
+          "top_k": 10,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "extended-cosine-250000-ratings",
+          "users": 10000,
+          "items": 10000,
+          "ratings_per_user": 25,
+          "method": "cosine",
+          "min_common_users": 3,
+          "top_l": 75,
+          "top_k": 20,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "extended-cooccurrence-250000-ratings",
+          "users": 10000,
+          "items": 10000,
+          "ratings_per_user": 25,
+          "method": "cooccurrence",
+          "min_common_users": 3,
+          "top_l": 75,
+          "top_k": 20,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "extended-cosine-500000-ratings",
+          "users": 20000,
+          "items": 20000,
+          "ratings_per_user": 25,
+          "method": "cosine",
+          "min_common_users": 5,
+          "top_l": 100,
+          "top_k": 20,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        },
+        {
+          "id": "extended-cooccurrence-500000-ratings",
+          "users": 20000,
+          "items": 20000,
+          "ratings_per_user": 25,
+          "method": "cooccurrence",
+          "min_common_users": 5,
+          "top_l": 100,
+          "top_k": 20,
+          "relevance_threshold": 4,
+          "reducers": 1,
+          "repetitions": 1
+        }
+      ]
+    }
+  ]
+}
