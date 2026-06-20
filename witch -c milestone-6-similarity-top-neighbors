@@ -1,0 +1,23 @@
+*   [33mb465531[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m merge: complete milestone 5 item-pair statistics
+[31m|[m[32m\[m  
+[31m|[m * [33m9f33c4e[m[33m ([m[1;31morigin/milestone-5-item-pair-statistics[m[33m, [m[1;32mmilestone-5-item-pair-statistics[m[33m)[m feat: add Hadoop item-pair statistics job
+[31m|[m[31m/[m  
+*   [33mc65eff4[m merge: complete milestone 4 user history job
+[33m|[m[34m\[m  
+[33m|[m * [33me31e07c[m[33m ([m[1;31morigin/milestone-4-user-history[m[33m, [m[1;32mmilestone-4-user-history[m[33m)[m feat: add Hadoop user history job
+[33m|[m[33m/[m  
+*   [33m014be8b[m merge: complete milestone 3 Hadoop Maven environment
+[35m|[m[36m\[m  
+[35m|[m * [33m8c3d519[m[33m ([m[1;31morigin/milestone-3-hadoop-maven[m[33m, [m[1;32mmilestone-3-hadoop-maven[m[33m)[m build: add Maven and Hadoop local-mode environment
+[35m|[m[35m/[m  
+*   [33m45632ea[m merge: complete milestone 2 Python ItemCF reference
+[1;31m|[m[1;32m\[m  
+[1;31m|[m * [33ma8df4df[m[33m ([m[1;31morigin/milestone-2-python-itemcf[m[33m, [m[1;32mmilestone-2-python-itemcf[m[33m)[m feat: add Python ItemCF reference implementation
+[1;31m|[m[1;31m/[m  
+*   [33m28513eb[m merge: complete milestone 1 preprocessing
+[1;33m|[m[1;34m\[m  
+[1;33m|[m * [33m6ca84a8[m[33m ([m[1;31morigin/milestone-1-preprocessing[m[33m, [m[1;32mmilestone-1-preprocessing[m[33m)[m feat: add Netflix dataset preprocessor
+[1;33m|[m[1;33m/[m  
+*   [33ma78d6e2[m merge: integrate remote initial commit
+[1;35m|[m[1;36m\[m  
+[1;35m|[m * [33ma180934[m 111

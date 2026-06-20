@@ -10,7 +10,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
 - Maven provides the Java build layer for compiling, testing, packaging, and running local Hadoop smoke checks.
-- Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, and `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics. Similarity calculation, prediction, watched-item filtering, and Top-K selection remain planned.
+- Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics, and `ItemSimilarityPipeline` is implemented for directed similarity and Top-L neighbor retention. Prediction, watched-item filtering, and Top-K selection remain planned.
 - Python scripts will support preprocessing, local Item-CF reference validation, evaluation, and plotting.
 - An optional demo application may load precomputed recommendation outputs for display.
 
@@ -22,8 +22,8 @@ flowchart TD
     B --> C[HDFS]
     C --> D[User History Job Implemented]
     D --> E[Pair Statistics Job Implemented]
-    E --> F[Similarity Job Planned]
-    F --> G[Prediction Job]
+    E --> F[Item Similarity and Top-L Implemented]
+    F --> G[Prediction Job Planned]
     G --> H[Top-K Job]
     H --> I[Recommendations]
     I --> J[Evaluation and Demo]
@@ -58,3 +58,17 @@ movieIdA,movieIdB<TAB>commonUsers,sumXY,sumX2,sumY2
 The custom `ItemPairWritable` compares numeric movie IDs, which keeps one-reducer fixture output deterministic and avoids lexicographic ordering mistakes such as sorting `10` before `2`. The aggregate fields match the Python Item-CF reference pair-statistics semantics.
 
 This stage does not calculate similarity values, retain Top-L neighbors, score recommendations, filter watched movies, produce Top-K results, or evaluate accuracy metrics.
+
+## Item Similarity And Top-L Stage
+
+Milestone 6 adds `ItemSimilarityPipeline`. It reads item-pair statistics, validates rows with `PairStatisticsRecord`, applies `min-common-users`, calculates either cosine or row-normalized co-occurrence similarity, converts unordered pair input into directed neighbor relations, and keeps at most Top-L neighbors per source movie.
+
+The stage writes:
+
+```text
+sourceMovieId,neighborMovieId<TAB>similarity,commonUsers
+```
+
+Cosine uses `sumXY / sqrt(sumX2 * sumY2)` and produces equal values in both directions. Co-occurrence uses source-specific common-user denominators before Top-L truncation, so directed values can be asymmetric. The final reducer orders retained neighbors by similarity descending and numeric neighbor movie ID ascending.
+
+This stage does not score recommendations, filter watched movies, produce Top-K recommendation rows, split train/test data, or calculate evaluation metrics.

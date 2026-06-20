@@ -60,6 +60,11 @@ user-history-output/
 hadoop-user-history-output/
 item-pair-stats-output/
 hadoop-item-pair-stats-output/
+item-similarity-output/
+hadoop-item-similarity-output/
+*-item-similarity-intermediate/
+*.item-similarity-intermediate/
+.*.item-similarity-intermediate/
 
 # Temporary files
 *.tmp
