@@ -181,9 +181,68 @@ Example:
 101	3:3.8000000000,4:3.0000000000
 ```
 
-## Planned Evaluation Output Formats
+## Implemented Train/Test Evaluation Rating CSV Formats
 
-Train/test split and evaluation metric output formats are planned for Milestone 9.
+Milestone 9 writes train and test splits using the same normalized ratings CSV header:
+
+```text
+userId,movieId,rating,date
+```
+
+The split is leave-one-out-by-time per user. Train and test rows are ordered by user ID ascending, date ascending, and movie ID ascending. The test file contains at most one row per user. Users with only one rating remain train-only.
+
+## Implemented Evaluation Metrics JSON
+
+The evaluator writes readable UTF-8 JSON with `allow_nan=False`.
+
+Required fields include:
+
+- `evaluation_method`
+- `k`
+- `relevance_threshold`
+- `test_rows`
+- `matched_test_predictions`
+- `missing_test_predictions`
+- `prediction_coverage`
+- `mae`
+- `rmse`
+- `ranking_eligible_users`
+- `ranking_hits`
+- `users_with_recommendations`
+- `recommendation_user_coverage`
+- `precision_at_k`
+- `recall_at_k`
+- `hit_rate_at_k`
+- `ndcg_at_k`
+- `mrr_at_k`
+- `watched_recommendations_found`
+- `train_test_overlap_rows`
+
+When no held-out rating has a matching raw prediction, `mae` and `rmse` are JSON `null`.
+
+## Implemented Evaluation Metrics CSV
+
+The one-row metrics CSV header is:
+
+```text
+method,k,relevanceThreshold,testRows,matchedPredictions,predictionCoverage,mae,rmse,rankingEligibleUsers,hits,precisionAtK,recallAtK,hitRateAtK,ndcgAtK,mrrAtK
+```
+
+Decimal values use a stable dot decimal representation and are suitable for import into reports or spreadsheets.
+
+## Implemented Per-User Evaluation CSV
+
+The per-user diagnostic CSV header is:
+
+```text
+userId,testMovieId,actualRating,predictedScore,absoluteError,squaredError,isRelevant,recommendationRank,hit,ndcg,mrr,recommendationCount
+```
+
+Empty fields are used when a held-out rating has no raw prediction, no recommendation rank, or no calculable prediction error.
+
+## Evaluation Split Statistics JSON
+
+The split statistics JSON includes `split_method` set to `leave-one-out-by-time`, `holdout_per_user` set to `1`, duplicate counts, user/item counts, and train/test row counts. The invariant `train_rows + test_rows = accepted_ratings` must hold.
 
 ## Environment Smoke Output
 

@@ -157,8 +157,7 @@ The Python Item-CF reference ranks recommendations by predicted score descending
 
 ## Limitations
 
-- No train/test split.
-- No evaluation metrics.
+- Train/test splitting and evaluation are handled by the separate Milestone 9 offline evaluation workflow.
 - No fallback recommendation for users with no unseen candidates.
 - No cold-start handling.
 - No movie metadata joins.
@@ -166,4 +165,4 @@ The Python Item-CF reference ranks recommendations by predicted score descending
 - Hadoop local mode is not HDFS, YARN, pseudo-distributed mode, or a cluster.
 - Native Windows Hadoop execution remains unsupported; Docker/Linux is the validation target.
 
-The next milestone is Milestone 9: train/test split and recommendation evaluation.
+The next milestone is Milestone 10: scalability and performance experiments.

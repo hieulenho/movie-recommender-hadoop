@@ -53,6 +53,7 @@ data/processed/*
 # Generated result files
 results/*
 !results/.gitkeep
+results/evaluation/
 
 # Generated Hadoop local output
 hadoop-smoke-output/
@@ -72,6 +73,7 @@ hadoop-recommendation-scoring-output/
 .*.recommendation-scoring-intermediate/
 top-k-recommendation-output/
 hadoop-top-k-recommendation-output/
+offline-evaluation-output/
 
 # Temporary files
 *.tmp

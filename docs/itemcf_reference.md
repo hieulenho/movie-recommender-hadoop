@@ -146,4 +146,4 @@ The statistics JSON includes:
 - No adjusted cosine.
 - No fallback recommendation.
 - Not designed for full Netflix-scale processing.
-- Evaluation metrics are deferred to Milestone 9.
+- Offline evaluation metrics are implemented by the separate Milestone 9 workflow rather than by the Python Item-CF reference script.

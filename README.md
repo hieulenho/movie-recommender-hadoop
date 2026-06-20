@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 8 - Watched-Item Filtering and Top-K Recommendation Hadoop Job completed**.
+Current status: **Milestone 9 - Time-Aware Train/Test Split and Offline Recommendation Evaluation completed**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, and final watched-item filtering/Top-K recommendation job are implemented. Train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, and deterministic offline evaluation workflow are implemented. Hadoop scalability experiments, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
 
 ## Main Objectives
 
@@ -27,7 +27,8 @@ The Netflix raw rating preprocessor, local Python Item-CF reference implementati
 ```text
 raw data
 -> preprocessing
--> user histories
+-> time-aware train/test split
+-> train-only user histories
 -> item-pair statistics
 -> item similarity
 -> recommendation scoring
@@ -55,6 +56,7 @@ raw data
 |   |-- item_similarity_job.md
 |   |-- recommendation_scoring_job.md
 |   |-- top_k_recommendation_job.md
+|   |-- offline_evaluation.md
 |   |-- hadoop_environment.md
 |   `-- references.md
 |-- data/
@@ -266,4 +268,24 @@ The final offline output format is:
 userId<TAB>movieId:score,movieId:score,...
 ```
 
-Watched movies are removed, each user has at most Top-K recommendations, and ties are broken by movie ID ascending. The output is precomputed for downstream evaluation or display. Evaluation metrics are planned for Milestone 9 and are not implemented yet.
+Watched movies are removed, each user has at most Top-K recommendations, and ties are broken by movie ID ascending. The output is precomputed for downstream evaluation or display.
+
+## Offline Evaluation Usage
+
+The Milestone 9 workflow creates a deterministic leave-one-out-by-time train/test split, builds all Hadoop recommender artifacts from the train split only, and evaluates raw predictions plus final Top-K recommendations against the held-out test ratings.
+
+Run the full Docker evaluation with cosine similarity:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_offline_evaluation_docker.ps1 -Method cosine -TopK 2 -TopL 10 -MinCommonUsers 1 -RelevanceThreshold 4
+```
+
+Run the same workflow with row-normalized co-occurrence:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_offline_evaluation_docker.ps1 -Method cooccurrence -TopK 2 -TopL 10 -MinCommonUsers 1 -RelevanceThreshold 4
+```
+
+Generated evaluation artifacts include `split_stats.json`, `metrics.json`, `metrics.csv`, and `per_user_metrics.csv` under `target/offline-evaluation/`. Principal metrics include prediction coverage, MAE, RMSE, Precision@K, Recall@K, Hit Rate@K, NDCG@K, and MRR@K. Missing predictions are reported rather than imputed.
+
+The test split is never passed to User History, Item-Pair Statistics, Similarity, Scoring, or Top-K generation. Milestone 10 will measure Hadoop scalability and performance; those experiments are intentionally not included in Milestone 9.
