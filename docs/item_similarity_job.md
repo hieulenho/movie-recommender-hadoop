@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Milestone 6 converts Milestone 5 item-pair statistics into directed item similarities and retains at most Top-L neighbors per source movie. The output is intended for Milestone 7 recommendation score calculation.
+Milestone 6 converts Milestone 5 item-pair statistics into directed item similarities and retains at most Top-L neighbors per source movie. The output is consumed by the Milestone 7 recommendation score calculation pipeline.
 
 This milestone stops at directed retained neighbor rows. It does not join similarities with user ratings, score recommendations, filter watched movies, produce Top-K recommendations, split train/test data, evaluate RMSE or ranking metrics, enrich movie metadata, start Hadoop daemons, add Spark, or add a web interface.
 
@@ -191,4 +191,4 @@ The formulas, min-common-users filtering, co-occurrence denominator timing, and 
 - Hadoop local mode is not HDFS, YARN, pseudo-distributed mode, or a cluster.
 - Native Windows Hadoop execution remains unsupported in this repository; Docker/Linux is the validation target.
 
-The next milestone is Milestone 7: recommendation score calculation.
+The downstream Hadoop stage is Milestone 7: recommendation score calculation.

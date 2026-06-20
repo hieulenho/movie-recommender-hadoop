@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 6 - Item Similarity and Top-L Neighbors Hadoop MapReduce Pipeline completed**.
+Current status: **Milestone 7 - Recommendation Score Calculation Hadoop MapReduce Pipeline completed**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, and Item Similarity/Top-L Neighbors MapReduce pipeline are implemented. Recommendation scoring, watched-item filtering, Top-K recommendation, train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, and raw Recommendation Scoring MapReduce pipeline are implemented. Watched-item filtering, Top-K recommendation, train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
 
 ## Main Objectives
 
@@ -30,7 +30,7 @@ raw data
 -> user histories
 -> item-pair statistics
 -> item similarity
--> prediction
+-> recommendation scoring
 -> filtering watched movies
 -> Top-K recommendations
 -> evaluation
@@ -53,6 +53,7 @@ raw data
 |   |-- user_history_job.md
 |   |-- item_pair_statistics_job.md
 |   |-- item_similarity_job.md
+|   |-- recommendation_scoring_job.md
 |   |-- hadoop_environment.md
 |   `-- references.md
 |-- data/
@@ -220,4 +221,26 @@ The output format is:
 sourceMovieId,neighborMovieId<TAB>similarity,commonUsers
 ```
 
-Similarity rows are directed. Cosine emits symmetric values for both directions; row-normalized co-occurrence may be asymmetric. Similarity values are formatted with exactly 10 digits after the decimal point. Recommendation scoring is planned for Milestone 7 and is not implemented yet.
+Similarity rows are directed. Cosine emits symmetric values for both directions; row-normalized co-occurrence may be asymmetric. Similarity values are formatted with exactly 10 digits after the decimal point. Recommendation scoring consumes this directed Top-L output in Milestone 7.
+
+## Recommendation Scoring Hadoop Pipeline Usage
+
+Run fixture raw recommendation scoring in Linux local mode:
+
+```bash
+bash scripts/run_recommendation_scoring.sh
+```
+
+Run the same validation from Windows through Docker:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_recommendation_scoring_docker.ps1
+```
+
+The output format is:
+
+```text
+userId,movieId<TAB>score
+```
+
+Scores are weighted averages over retained directed Top-L similarities and are formatted with exactly 10 digits after the decimal point. Raw prediction rows may include movies the user has already rated; watched-item filtering and Top-K ranking are deferred to Milestone 8.
