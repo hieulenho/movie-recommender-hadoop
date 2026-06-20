@@ -20,6 +20,9 @@
 - Hadoop reducer output should be deterministic where practical, including sorted keys or sorted values when the format depends on order.
 - Custom Hadoop keys for numeric IDs should compare numerically, not lexicographically.
 - Item-pair statistics use unordered movie pairs with `firstMovieId < secondMovieId` and accumulate `commonUsers`, `sumXY`, `sumX2`, and `sumY2` consistently with the Python Item-CF reference.
+- Similarity computations must match the Python Item-CF reference semantics for cosine, row-normalized co-occurrence, min-common-users filtering, and Top-L ordering.
+- Floating-point computations must be tested with tolerances, and implementations must not round internally before final output serialization.
+- Similarity and recommendation ranking must use deterministic tie-breaking: score or similarity descending, then numeric movie ID ascending.
 - Docker integration validation on Windows should compare committed fixture output against expected files when a deterministic expected output exists.
 - Item-pair fixture outputs should remain small enough to verify manually and compare against the Python Item-CF reference semantics.
 - Later Hadoop outputs should be checked against committed expected fixtures and, where applicable, the Python Item-CF reference on small inputs.

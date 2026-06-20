@@ -143,4 +143,4 @@ The accumulated fields match the pair-statistics definitions in `docs/itemcf_ref
 - Hadoop local mode is not HDFS, YARN, pseudo-distributed mode, or a cluster.
 - Native Windows Hadoop execution remains unsupported in this repository; Docker/Linux is the validation target.
 
-The next milestone is Milestone 6: similarity and Top-L neighbors.
+The downstream Hadoop stage is Milestone 6: similarity and Top-L neighbors.

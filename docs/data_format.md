@@ -105,10 +105,31 @@ Example:
 1,3	2,30,20,50
 ```
 
-## Planned Hadoop Similarity Format
+## Implemented Hadoop Directed Similarity Format
 
 ```text
-movieId<TAB>neighborId:similarity,neighborId:similarity
+sourceMovieId,neighborMovieId<TAB>similarity,commonUsers
+```
+
+Milestone 6 adds the Hadoop item-similarity and Top-L neighbor implementation.
+
+Rules:
+
+- Rows are directed retained neighbor relations.
+- The key contains `sourceMovieId,neighborMovieId`.
+- The value contains `similarity,commonUsers`.
+- Similarity is written with exactly 10 digits after the decimal point.
+- Cosine produces equal values for both directions of an eligible unordered pair.
+- Row-normalized co-occurrence may be asymmetric because each source movie has its own denominator.
+- `min-common-users` filtering is applied before co-occurrence denominators and Top-L selection.
+- Top-L neighbors are ordered by similarity descending, then numeric neighbor movie ID ascending.
+- There is no header row.
+
+Example:
+
+```text
+1,2	0.3000000000,3
+3,1	0.2500000000,2
 ```
 
 ## Planned Hadoop Prediction Format

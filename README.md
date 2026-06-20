@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 5 - Item-Pair Statistics Hadoop MapReduce Job completed**.
+Current status: **Milestone 6 - Item Similarity and Top-L Neighbors Hadoop MapReduce Pipeline completed**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, and Item-Pair Statistics MapReduce job are implemented. Similarity, recommendation scoring, watched-item filtering, Top-K recommendation, train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, and Item Similarity/Top-L Neighbors MapReduce pipeline are implemented. Recommendation scoring, watched-item filtering, Top-K recommendation, train/test evaluation, Spark, a web UI, and Hadoop cluster deployment are not implemented yet.
 
 ## Main Objectives
 
@@ -52,6 +52,7 @@ raw data
 |   |-- itemcf_reference.md
 |   |-- user_history_job.md
 |   |-- item_pair_statistics_job.md
+|   |-- item_similarity_job.md
 |   |-- hadoop_environment.md
 |   `-- references.md
 |-- data/
@@ -190,6 +191,33 @@ The output format is:
 movieIdA,movieIdB<TAB>commonUsers,sumXY,sumX2,sumY2
 ```
 
-Movie pairs are unordered with `movieIdA < movieIdB`. The statistics match the Python Item-CF reference definitions and are intended for the later similarity milestone.
+Movie pairs are unordered with `movieIdA < movieIdB`. The statistics match the Python Item-CF reference definitions and are intended for the similarity milestone.
 
-Similarity and recommendation jobs are planned for later milestones and are not part of this implementation.
+## Item Similarity Hadoop Pipeline Usage
+
+Run fixture cosine similarity in Linux local mode:
+
+```bash
+bash scripts/run_item_similarity.sh cosine
+```
+
+Run fixture co-occurrence similarity in Linux local mode:
+
+```bash
+bash scripts/run_item_similarity.sh cooccurrence
+```
+
+Run the same validations from Windows through Docker:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_item_similarity_docker.ps1 -Method cosine
+powershell -ExecutionPolicy Bypass -File scripts/run_item_similarity_docker.ps1 -Method cooccurrence
+```
+
+The output format is:
+
+```text
+sourceMovieId,neighborMovieId<TAB>similarity,commonUsers
+```
+
+Similarity rows are directed. Cosine emits symmetric values for both directions; row-normalized co-occurrence may be asymmetric. Similarity values are formatted with exactly 10 digits after the decimal point. Recommendation scoring is planned for Milestone 7 and is not implemented yet.
