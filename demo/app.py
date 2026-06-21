@@ -11,12 +11,12 @@ import streamlit as st
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from demo import data_loader, service
+from demo import artifact_paths, data_loader, service
 from demo.models import BenchmarkRun, DemoDataBundle, DemoValidationError, EvaluationMetrics
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-FIXTURE_WARNING = "Demonstration fixture — these values are for validating the interface, not final experimental results."
+FIXTURE_WARNING = "Demonstration fixture - these values are for validating the interface, not final experimental results."
 BENCHMARK_COMMAND = "powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_docker.ps1 -Profile smoke"
 LOCAL_MODE_LIMITATION = (
     "Các phép đo được thực hiện trong một container Hadoop local mode; "
@@ -26,13 +26,9 @@ LOCAL_MODE_LIMITATION = (
 
 st.set_page_config(
     page_title="Movie Recommender Offline Demo",
-    page_icon="🎬",
+    page_icon=":movie_camera:",
     layout="wide",
 )
-
-
-def _default_path(relative: str) -> str:
-    return str(REPO_ROOT / relative)
 
 
 def _artifact_signature(paths: Mapping[str, str]) -> tuple[tuple[str, tuple[tuple[str, int, float], ...]], ...]:
@@ -67,12 +63,22 @@ def _metric_text(value: object) -> str:
     if value is None or value == "":
         return "Không có dữ liệu"
     if isinstance(value, float):
-        return f"{value:.10f}"
+        return f"{value:.3f}"
     return str(value)
 
 
-def _render_metric(label: str, value: object) -> None:
-    st.metric(label, _metric_text(value))
+def _count_metric_text(value: object) -> str:
+    if value is None or value == "":
+        return "Không có dữ liệu"
+    if isinstance(value, (int, float)):
+        return f"{int(value)}"
+    return str(value)
+
+
+def _percent_metric_text(value: object) -> str:
+    if value is None or value == "":
+        return "Không có dữ liệu"
+    return f"{float(value) * 100:.2f}%"
 
 
 def _render_recommendations(bundle: DemoDataBundle) -> None:
@@ -81,12 +87,13 @@ def _render_recommendations(bundle: DemoDataBundle) -> None:
     profile = service.get_user_profile(bundle, int(selected_text))
     summary = service.build_user_summary(profile)
 
-    c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("User ID", summary["user_id"])
-    c2.metric("Đã xem", summary["watched_movie_count"])
-    c3.metric("Gợi ý", summary["recommendation_count"])
-    c4.metric("Điểm lịch sử TB", _metric_text(summary["average_historical_rating"]))
-    c5.metric("Điểm gợi ý cao nhất", _metric_text(summary["highest_recommendation_score"]))
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
+    c1.metric("User ID", _count_metric_text(summary["user_id"]))
+    c2.metric("Đã xem", _count_metric_text(summary["watched_movie_count"]))
+    c3.metric("Gợi ý", _count_metric_text(summary["recommendation_count"]))
+    c4.metric("Rating TB", _metric_text(summary["average_historical_rating"]))
+    c5.metric("Score TB", _metric_text(summary["average_recommendation_score"]))
+    c6.metric("Score cao nhất", _metric_text(summary["highest_recommendation_score"]))
 
     st.subheader("Phim đã xem")
     st.dataframe(service.build_history_rows(profile, bundle.metadata), width="stretch", hide_index=True)
@@ -109,20 +116,20 @@ def _render_evaluation(metrics: EvaluationMetrics | None) -> None:
     summary = service.summarize_evaluation_metrics(metrics)
     c1, c2, c3 = st.columns(3)
     c1.metric("Phương pháp", _metric_text(summary["evaluation_method"]))
-    c2.metric("K", _metric_text(summary["k"]))
-    c3.metric("Ngưỡng liên quan", _metric_text(summary["relevance_threshold"]))
+    c2.metric("K", _count_metric_text(summary["k"]))
+    c3.metric("Ngưỡng liên quan", _count_metric_text(summary["relevance_threshold"]))
 
     c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("Coverage", _metric_text(summary["prediction_coverage"]))
+    c1.metric("Coverage", _percent_metric_text(summary["prediction_coverage"]))
     c2.metric("MAE", _metric_text(summary["mae"]))
     c3.metric("RMSE", _metric_text(summary["rmse"]))
-    c4.metric("Precision@K", _metric_text(summary["precision_at_k"]))
-    c5.metric("Recall@K", _metric_text(summary["recall_at_k"]))
+    c4.metric("Precision@K", _percent_metric_text(summary["precision_at_k"]))
+    c5.metric("Recall@K", _percent_metric_text(summary["recall_at_k"]))
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Hit Rate@K", _metric_text(summary["hit_rate_at_k"]))
-    c2.metric("NDCG@K", _metric_text(summary["ndcg_at_k"]))
-    c3.metric("MRR@K", _metric_text(summary["mrr_at_k"]))
+    c1.metric("Hit Rate@K", _percent_metric_text(summary["hit_rate_at_k"]))
+    c2.metric("NDCG@K", _percent_metric_text(summary["ndcg_at_k"]))
+    c3.metric("MRR@K", _percent_metric_text(summary["mrr_at_k"]))
 
     diagnostics = [
         {"Metric": "Matched predictions", "Value": summary["matched_test_predictions"]},
@@ -137,12 +144,15 @@ def _render_evaluation(metrics: EvaluationMetrics | None) -> None:
         st.warning("Cảnh báo: có train/test overlap trong artifact đánh giá.")
     if (summary["watched_recommendations_found"] or 0) > 0:
         st.warning("Cảnh báo: có gợi ý trùng với phim đã xem.")
-    st.info("Trong leave-one-out evaluation, Recall@K và Hit Rate@K có thể bằng nhau vì mỗi user có tối đa một item held-out liên quan.")
+    st.info(
+        "Trong leave-one-out evaluation, Recall@K và Hit Rate@K có thể bằng nhau "
+        "vì mỗi user có tối đa một item held-out liên quan."
+    )
 
 
 def _filter_options(runs: tuple[BenchmarkRun, ...], field: str) -> list[str]:
     values = sorted({str(getattr(run, field)) for run in runs if getattr(run, field)})
-    return ["Tat ca"] + values
+    return ["Tất cả"] + values
 
 
 def _render_scalability(runs: tuple[BenchmarkRun, ...]) -> None:
@@ -157,21 +167,21 @@ def _render_scalability(runs: tuple[BenchmarkRun, ...]) -> None:
     filtered = tuple(
         run
         for run in runs
-        if (method == "Tat ca" or run.method == method)
-        and (profile == "Tat ca" or run.profile == profile)
+        if (method == "Tất cả" or run.method == method)
+        and (profile == "Tất cả" or run.profile == profile)
     )
     summary = service.summarize_benchmark_results(filtered)
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Thành công", summary["successful_count"])
-    c2.metric("Thất bại", summary["failed_count"])
-    c3.metric("Ratings min", _metric_text(summary["min_ratings_rows"]))
-    c4.metric("Ratings max", _metric_text(summary["max_ratings_rows"]))
+    c1.metric("Thành công", _count_metric_text(summary["successful_count"]))
+    c2.metric("Thất bại", _count_metric_text(summary["failed_count"]))
+    c3.metric("Ratings min", _count_metric_text(summary["min_ratings_rows"]))
+    c4.metric("Ratings max", _count_metric_text(summary["max_ratings_rows"]))
 
     successful = tuple(summary["successful_runs"])
     st.dataframe(service.benchmark_table_rows(successful), width="stretch", hide_index=True)
 
     if successful:
-        selected = st.selectbox("Chi tiet experiment", [run.experiment_id for run in successful])
+        selected = st.selectbox("Chi tiết experiment", [run.experiment_id for run in successful])
         run = next(item for item in successful if item.experiment_id == selected)
         st.subheader("Stage runtime breakdown")
         st.dataframe(service.stage_runtime_rows(run), width="stretch", hide_index=True)
@@ -188,7 +198,7 @@ def _render_architecture() -> None:
             [
                 "Raw Netflix-style ratings",
                 "-> preprocessing",
-                "-> time-aware train/test split",
+                "-> train/test split",
                 "-> User History MapReduce",
                 "-> Item-Pair Statistics MapReduce",
                 "-> Similarity and Top-L MapReduce",
@@ -212,29 +222,26 @@ def _render_architecture() -> None:
     )
 
 
+def _local_artifact_inputs() -> dict[str, str]:
+    defaults = artifact_paths.build_local_artifact_defaults(REPO_ROOT)
+    st.sidebar.markdown("### Đường dẫn artifact cục bộ")
+    return {
+        "user_history": st.sidebar.text_input("Lịch sử người dùng", defaults["user_history"]),
+        "recommendations": st.sidebar.text_input("Gợi ý Top-K cuối cùng", defaults["recommendations"]),
+        "evaluation": st.sidebar.text_input("Chỉ số đánh giá", defaults["evaluation"]),
+        "benchmark": st.sidebar.text_input("Kết quả benchmark", defaults["benchmark"]),
+        "metadata": st.sidebar.text_input("Metadata phim", defaults["metadata"]),
+    }
+
+
 def main() -> None:
     st.title("Movie Recommender Offline Demo")
     st.caption("Lớp trình diễn read-only trên các artifact gợi ý đã được tính sẵn.")
 
     mode_label = st.sidebar.selectbox("Nguồn dữ liệu", ["Bundled demonstration sample", "Local pipeline artifacts"])
     mode = "sample" if mode_label.startswith("Bundled") else "local"
-    paths: dict[str, str] = {}
     if mode == "sample":
         st.info(FIXTURE_WARNING)
-    else:
-        st.sidebar.markdown("### Đường dẫn artifact cục bộ")
-        paths = {
-            "user_history": st.sidebar.text_input("User history", _default_path("target/offline-evaluation/stages/user-history")),
-            "recommendations": st.sidebar.text_input(
-                "Final Top-K recommendations",
-                _default_path("target/offline-evaluation/evaluator/top_k_recommendations.txt"),
-            ),
-            "evaluation": st.sidebar.text_input("Evaluation metrics JSON", _default_path("target/offline-evaluation/evaluator/metrics.json")),
-            "benchmark": st.sidebar.text_input("Benchmark results CSV", _default_path("target/scalability-benchmark/benchmark_results.csv")),
-            "metadata": st.sidebar.text_input("Movie metadata CSV (optional)", ""),
-        }
-
-    if mode == "sample":
         paths = {
             "user_history": str(data_loader.SAMPLE_DIR / "user_history.txt"),
             "recommendations": str(data_loader.SAMPLE_DIR / "recommendations.txt"),
@@ -242,9 +249,18 @@ def main() -> None:
             "metadata": str(data_loader.SAMPLE_DIR / "movie_metadata.csv"),
             "benchmark": "",
         }
+    else:
+        paths = _local_artifact_inputs()
+
+    load_paths = artifact_paths.resolve_paths_for_loading(paths, REPO_ROOT)
+    required_errors = [] if mode == "sample" else artifact_paths.required_artifact_errors(paths, REPO_ROOT)
+    if required_errors:
+        for error in required_errors:
+            st.error(error)
+        return
 
     try:
-        bundle = _load_bundle_cached(mode, paths, _artifact_signature(paths))
+        bundle = _load_bundle_cached(mode, load_paths, _artifact_signature(load_paths))
         integrity_errors = service.validate_bundle_integrity(bundle)
         if integrity_errors:
             st.error("Artifact gợi ý không hợp lệ. Không hiển thị bundle bị lỗi.")
