@@ -101,9 +101,12 @@ Fatal filesystem and configuration errors return a non-zero exit code and print 
 
 Malformed input rows are nonfatal and are summarized in the statistics JSON.
 
+The Milestone 12 full reference dataset workflow adds a stricter validation layer before calling this preprocessor. For `data/raw/github-reference/`, malformed rows are fatal and no malformed row may be silently skipped.
+
 ## Limitations
 
 - The tool only normalizes raw ratings; it does not implement Item-Based Collaborative Filtering.
 - The tool does not run Hadoop, MapReduce, model training, recommendation generation, evaluation metrics, or a web interface.
 - It does not download the real Netflix Prize dataset.
 - It assumes UTF-8 compatible text input.
+- The Milestone 12 full reference workflow processes the 15-movie GitHub reference-repository subset, not the complete official Netflix Prize dataset.

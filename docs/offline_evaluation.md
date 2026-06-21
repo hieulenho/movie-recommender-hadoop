@@ -130,3 +130,5 @@ The runner writes artifacts under `target/offline-evaluation/`:
 - No Hadoop daemons are started; validation uses Hadoop local mode inside Docker.
 
 Milestone 10 adds scalability and performance benchmark tooling around this local-mode evaluation path. See `docs/scalability_experiments.md`.
+
+Milestone 12 reuses the same leakage-preventing offline evaluation path for both cosine and row-normalized co-occurrence on the 15-movie GitHub reference-repository subset. The held-out test split remains evaluator-only input.
