@@ -131,4 +131,4 @@ The runner writes artifacts under `target/offline-evaluation/`:
 
 Milestone 10 adds scalability and performance benchmark tooling around this local-mode evaluation path. See `docs/scalability_experiments.md`.
 
-Milestone 12 reuses the same leakage-preventing offline evaluation path for both cosine and row-normalized co-occurrence on the 15-movie GitHub reference-repository subset. The held-out test split remains evaluator-only input.
+Milestone 12 reuses the same leakage-preventing offline evaluation path for both cosine and row-normalized co-occurrence on MovieLens 1M. MovieLens splitting uses exact Unix timestamps, not date-only ordering. The GitHub 15-movie run remains compatibility validation only.

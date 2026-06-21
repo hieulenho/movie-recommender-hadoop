@@ -1,8 +1,9 @@
-"""Validate final Streamlit demo inputs without mutating Hadoop artifacts."""
+"""Validate MovieLens Streamlit demo inputs without mutating Hadoop artifacts."""
 
 from __future__ import annotations
 
 import argparse
+import csv
 from pathlib import Path
 import sys
 from typing import Any, Mapping, Sequence
@@ -10,177 +11,168 @@ from typing import Any, Mapping, Sequence
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from demo import artifact_paths
 from demo.data_loader import build_demo_bundle, build_sample_bundle, load_benchmark_results
 from demo.models import DemoValidationError
-from demo.service import summarize_benchmark_results, validate_bundle_integrity
-from scripts.final_artifact_utils import repo_root_from, relative_path, write_json
+from demo.service import validate_bundle_integrity
+from scripts.final_artifact_utils import load_json, repo_root_from, relative_path, write_json
 
 
-def _bundle_summary(bundle: Any) -> dict[str, Any]:
-    user_count = len(bundle.users)
-    watched_movies = sum(len(profile.watched) for profile in bundle.users.values())
-    recommendation_users = sum(1 for profile in bundle.users.values() if profile.recommendations)
-    recommendation_items = sum(len(profile.recommendations) for profile in bundle.users.values())
+def _count_validation_categories(errors: Sequence[str]) -> dict[str, int]:
+    return {
+        "watched_recommendation_violations": sum(1 for item in errors if "watched movie" in item),
+        "duplicate_recommendation_violations": sum(1 for item in errors if "duplicates movie" in item),
+        "ordering_violations": sum(1 for item in errors if "order" in item),
+        "invalid_score_violations": sum(1 for item in errors if "score" in item and "order" not in item),
+    }
+
+
+def _bundle_fields(bundle: Any) -> dict[str, Any]:
     referenced_movie_ids = {
         item.movie_id
         for profile in bundle.users.values()
         for item in [*profile.watched, *profile.recommendations]
     }
-    metadata_movie_ids = set(bundle.metadata)
-    unknown_metadata = sorted(referenced_movie_ids - metadata_movie_ids)
+    metadata_ids = set(bundle.metadata)
+    unknown_metadata = sorted(referenced_movie_ids - metadata_ids)
     coverage = None
     if referenced_movie_ids:
         coverage = (len(referenced_movie_ids) - len(unknown_metadata)) / len(referenced_movie_ids)
-    integrity_errors = validate_bundle_integrity(bundle)
+    validation_errors = validate_bundle_integrity(bundle)
+    categories = _count_validation_categories(validation_errors)
     return {
-        "valid": not integrity_errors,
-        "user_count": user_count,
-        "watched_movie_count": watched_movies,
-        "recommendation_user_count": recommendation_users,
-        "recommendation_item_count": recommendation_items,
-        "metadata_row_count": len(bundle.metadata),
-        "referenced_movie_count": len(referenced_movie_ids),
+        "users_loaded": len(bundle.users),
+        "watched_ratings_loaded": sum(len(profile.watched) for profile in bundle.users.values()),
+        "recommendation_users_loaded": sum(1 for profile in bundle.users.values() if profile.recommendations),
+        "recommendations_loaded": sum(len(profile.recommendations) for profile in bundle.users.values()),
+        "metadata_records_loaded": len(bundle.metadata),
         "metadata_coverage": coverage,
         "unknown_metadata_movies": unknown_metadata,
-        "integrity_error_count": len(integrity_errors),
-        "integrity_errors": integrity_errors[:20],
+        **categories,
+        "integrity_errors": validation_errors,
     }
+
+
+def _comparison_loaded(path: Path) -> bool:
+    if not path.is_file():
+        return False
+    with path.open("r", encoding="utf-8", newline="") as input_file:
+        rows = [dict(row) for row in csv.DictReader(input_file)]
+    return {row.get("method") for row in rows} >= {"cosine", "cooccurrence"}
 
 
 def validate_streamlit_artifacts(
     repo_root: Path | str,
-    user_history: Path | str,
-    recommendations: Path | str,
-    metadata: Path | str,
-    metrics: Path | str,
+    method: str = "cosine",
     benchmark: Path | str | None = None,
+    app_test_passed: bool | None = None,
+    health_check_passed: bool | None = None,
 ) -> dict[str, Any]:
     root = Path(repo_root).resolve()
+    defaults = artifact_paths.MOVIELENS_DEFAULTS_BY_METHOD[method]
+    paths = {key: root / value for key, value in defaults.items()}
     errors: list[str] = []
     warnings: list[str] = []
     result: dict[str, Any] = {
-        "status": "failed",
-        "repo_root": ".",
-        "source_mode": "bundled-sample-and-full-reference-artifacts",
+        "dataset_name": "MovieLens 1M",
+        "method": method,
+        "source_mode": "movielens-1m-primary-artifacts",
+        "inputs": {key: relative_path(path, root) for key, path in paths.items()},
+        "metrics_loaded": False,
+        "comparison_loaded": False,
+        "benchmark_loaded": False,
+        "app_test_passed": app_test_passed,
+        "health_check_passed": health_check_passed,
+        "real_movielens_artifacts_valid": False,
         "errors": errors,
         "warnings": warnings,
-        "inputs": {
-            "user_history": relative_path(user_history, root),
-            "recommendations": relative_path(recommendations, root),
-            "metadata": relative_path(metadata, root),
-            "metrics": relative_path(metrics, root),
-            "benchmark": None if benchmark is None else relative_path(benchmark, root),
-        },
     }
 
     try:
-        sample_bundle = build_sample_bundle()
-        result["bundled_sample"] = _bundle_summary(sample_bundle)
+        build_sample_bundle()
     except (DemoValidationError, OSError) as exc:
-        errors.append(f"Bundled sample validation failed: {exc}")
+        warnings.append(f"Bundled sample validation failed: {exc}")
 
     try:
-        real_bundle = build_demo_bundle(
-            user_history_path=Path(user_history),
-            recommendations_path=Path(recommendations),
-            evaluation_metrics_path=Path(metrics),
+        bundle = build_demo_bundle(
+            user_history_path=paths["user_history"],
+            recommendations_path=paths["recommendations"],
+            evaluation_metrics_path=paths["evaluation"],
             benchmark_results_path=None,
-            movie_metadata_path=Path(metadata),
-            manifest_path=root / "results" / "full-reference-dataset" / "full_dataset_manifest.json",
+            movie_metadata_path=paths["metadata"],
+            manifest_path=paths["manifest"],
+            dataset_type="movielens",
         )
-        result["real_artifacts"] = _bundle_summary(real_bundle)
+        result.update(_bundle_fields(bundle))
     except (DemoValidationError, OSError) as exc:
-        errors.append(f"Full-reference artifact validation failed: {exc}")
-
-    cooccurrence_paths = {
-        "user_history": root / "results" / "full-reference-dataset" / "cooccurrence" / "user-history",
-        "recommendations": root / "results" / "full-reference-dataset" / "cooccurrence" / "recommendations",
-        "metrics": root / "results" / "full-reference-dataset" / "cooccurrence" / "metrics.json",
-        "metadata": root / "results" / "full-reference-dataset" / "metadata" / "movie_metadata.csv",
-    }
-    if all(path.exists() for path in cooccurrence_paths.values()):
-        try:
-            cooccurrence_bundle = build_demo_bundle(
-                user_history_path=cooccurrence_paths["user_history"],
-                recommendations_path=cooccurrence_paths["recommendations"],
-                evaluation_metrics_path=cooccurrence_paths["metrics"],
-                benchmark_results_path=None,
-                movie_metadata_path=cooccurrence_paths["metadata"],
-                manifest_path=root / "results" / "full-reference-dataset" / "full_dataset_manifest.json",
-            )
-            result["cooccurrence_artifacts"] = _bundle_summary(cooccurrence_bundle)
-        except (DemoValidationError, OSError) as exc:
-            errors.append(f"Full-reference cooccurrence artifact validation failed: {exc}")
-    else:
-        warnings.append("Cooccurrence full-reference artifacts are unavailable; cosine validation still ran.")
-
-    if benchmark is None or not Path(benchmark).exists():
-        warnings.append("Benchmark CSV is unavailable; Streamlit benchmark tab can still load without real benchmark runs.")
-        result["benchmark"] = {
-            "loaded": False,
-            "successful_benchmark_runs": 0,
-            "failed_benchmark_runs": 0,
-            "reason": "unavailable",
-        }
-    else:
-        try:
-            runs = load_benchmark_results(Path(benchmark))
-            summary = summarize_benchmark_results(runs)
-            result["benchmark"] = {
-                "loaded": True,
-                "successful_benchmark_runs": summary["successful_count"],
-                "failed_benchmark_runs": summary["failed_count"],
-                "min_ratings_rows": summary["min_ratings_rows"],
-                "max_ratings_rows": summary["max_ratings_rows"],
+        errors.append(f"MovieLens artifact validation failed: {exc}")
+        result.update(
+            {
+                "users_loaded": 0,
+                "watched_ratings_loaded": 0,
+                "recommendation_users_loaded": 0,
+                "recommendations_loaded": 0,
+                "metadata_records_loaded": 0,
+                "metadata_coverage": None,
+                "unknown_metadata_movies": [],
+                "watched_recommendation_violations": 0,
+                "duplicate_recommendation_violations": 0,
+                "ordering_violations": 0,
+                "invalid_score_violations": 0,
             }
+        )
+
+    if paths["evaluation"].is_file():
+        try:
+            metrics = load_json(paths["evaluation"])
+            result["metrics_loaded"] = True
+            result["train_test_overlap_rows"] = metrics.get("train_test_overlap_rows")
+        except (OSError, ValueError) as exc:
+            errors.append(f"MovieLens metrics validation failed: {exc}")
+            result["train_test_overlap_rows"] = None
+    else:
+        errors.append(f"MovieLens metrics file is missing: {relative_path(paths['evaluation'], root)}")
+        result["train_test_overlap_rows"] = None
+
+    try:
+        result["comparison_loaded"] = _comparison_loaded(paths["method_comparison"])
+        if not result["comparison_loaded"]:
+            warnings.append("MovieLens method comparison is unavailable or incomplete.")
+    except (OSError, csv.Error) as exc:
+        errors.append(f"MovieLens method comparison validation failed: {exc}")
+
+    benchmark_path = Path(benchmark) if benchmark is not None else paths["benchmark"]
+    if benchmark_path.is_file():
+        try:
+            load_benchmark_results(benchmark_path)
+            result["benchmark_loaded"] = True
         except (DemoValidationError, OSError) as exc:
-            errors.append(f"Benchmark CSV validation failed: {exc}")
+            warnings.append(f"Synthetic benchmark CSV validation failed: {exc}")
+    else:
+        warnings.append("Synthetic benchmark CSV is unavailable; this is non-fatal for MovieLens demo validation.")
 
-    if result.get("bundled_sample", {}).get("valid") is not True:
-        errors.append("Bundled sample integrity check did not pass.")
-    if result.get("real_artifacts", {}).get("valid") is not True:
-        errors.append("Full-reference artifact integrity check did not pass.")
-    if "cooccurrence_artifacts" in result and result.get("cooccurrence_artifacts", {}).get("valid") is not True:
-        errors.append("Full-reference cooccurrence artifact integrity check did not pass.")
-
-    result["status"] = "passed" if not errors else "failed"
+    result["real_movielens_artifacts_valid"] = (
+        not errors
+        and result.get("metrics_loaded") is True
+        and result.get("watched_recommendation_violations") == 0
+        and result.get("duplicate_recommendation_violations") == 0
+        and result.get("ordering_violations") == 0
+        and result.get("invalid_score_violations") == 0
+        and result.get("train_test_overlap_rows") == 0
+    )
+    result["status"] = "passed" if result["real_movielens_artifacts_valid"] else "failed"
     return result
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
     root = repo_root_from()
-    parser = argparse.ArgumentParser(description="Validate final Streamlit demo artifacts.")
+    parser = argparse.ArgumentParser(description="Validate final Streamlit MovieLens artifacts.")
     parser.add_argument("--repo-root", default=str(root), help="Repository root.")
-    parser.add_argument(
-        "--user-history",
-        default="results/full-reference-dataset/cosine/user-history",
-        help="Hadoop user-history output file or directory.",
-    )
-    parser.add_argument(
-        "--recommendations",
-        default="results/full-reference-dataset/cosine/recommendations",
-        help="Hadoop recommendation output file or directory.",
-    )
-    parser.add_argument(
-        "--metadata",
-        default="results/full-reference-dataset/metadata/movie_metadata.csv",
-        help="Movie metadata CSV.",
-    )
-    parser.add_argument(
-        "--metrics",
-        default="results/full-reference-dataset/cosine/metrics.json",
-        help="Evaluation metrics JSON.",
-    )
-    parser.add_argument(
-        "--benchmark",
-        default="target/scalability-benchmark/benchmark_results.csv",
-        help="Optional real benchmark CSV.",
-    )
-    parser.add_argument(
-        "--output",
-        default="target/final-validation/streamlit_validation.json",
-        help="Validation JSON output path.",
-    )
+    parser.add_argument("--method", choices=["cosine", "cooccurrence"], default="cosine")
+    parser.add_argument("--benchmark", default="target/scalability-benchmark/benchmark_results.csv")
+    parser.add_argument("--output", default="target/final-validation/streamlit_movielens_1m_validation.json")
+    parser.add_argument("--app-test-passed", action="store_true")
+    parser.add_argument("--health-check-passed", action="store_true")
     return parser
 
 
@@ -191,14 +183,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     benchmark = root / args.benchmark if args.benchmark else None
     result = validate_streamlit_artifacts(
         root,
-        root / args.user_history,
-        root / args.recommendations,
-        root / args.metadata,
-        root / args.metrics,
-        benchmark,
+        method=args.method,
+        benchmark=benchmark,
+        app_test_passed=True if args.app_test_passed else None,
+        health_check_passed=True if args.health_check_passed else None,
     )
     write_json(root / args.output, result)
-    print(f"Streamlit final validation: {result['status']}")
+    print(f"Streamlit MovieLens validation: {result['status']}")
     for warning in result["warnings"]:
         print(f"Warning: {warning}")
     for error in result["errors"]:

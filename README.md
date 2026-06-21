@@ -2,9 +2,17 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 12 - Finalization and v1.0.0 release-candidate preparation**.
+Current status: **Milestone 12 - MovieLens 1M primary experiment migration and final validation**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, reproducible scalability benchmark tooling, read-only Streamlit demo, full GitHub reference-repository dataset workflow, and final report/package helpers are implemented. Spark and Hadoop cluster deployment are not implemented.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, reproducible scalability benchmark tooling, read-only Streamlit demo, GitHub reference-repository compatibility workflow, MovieLens 1M primary workflow, and final report/package helpers are implemented. Spark and Hadoop cluster deployment are not implemented.
+
+## Dataset Roles
+
+- **MovieLens 1M** is the primary real experimental dataset for final evaluation, report numbers, slides, and real-artifact Streamlit mode.
+- **GitHub reference 15-movie dataset** is retained for compatibility and regression workflow validation.
+- **Synthetic datasets** are used only for controlled scalability experiments.
+
+Do not present synthetic scalability rows or GitHub 15-file compatibility metrics as final MovieLens recommendation-quality results.
 
 ## Main Objectives
 
@@ -26,20 +34,20 @@ The Netflix raw rating preprocessor, local Python Item-CF reference implementati
 ## Planned Pipeline
 
 ```text
-raw data
--> preprocessing
--> train/test split
+MovieLens 1M ratings.dat
+-> exact timestamp preprocessing
+-> time-aware train/test split
 -> train-only user histories
--> item-pair statistics
--> item similarity
+-> shared item-pair statistics
+-> cosine / co-occurrence similarity
 -> recommendation scoring
 -> filtering watched movies
 -> Top-K recommendations
--> evaluation
+-> held-out evaluation
 -> read-only demo
 ```
 
-For dated datasets, the evaluation split can use the documented time-aware policy. The full GitHub reference-repository run has no rating dates, so it uses deterministic non-temporal leave-one-out by highest numeric `movieId`.
+MovieLens 1M uses deterministic leave-one-out by exact Unix timestamp. The GitHub reference-repository run has no rating dates, so it remains a compatibility workflow using deterministic non-temporal leave-one-out by highest numeric `movieId`.
 
 ## Repository Structure
 
@@ -103,6 +111,75 @@ For dated datasets, the evaluation split can use the documented time-aware polic
 
 Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files must not be committed to Git. Contents under `data/raw`, `data/processed`, and generated `results` outputs are ignored except for placeholder files. Only tiny reviewable sample files may be committed under `data/sample` or `demo/sample`.
 
+MovieLens 1M raw files are never committed or included in the submission ZIP. Acquire them from the official GroupLens source and review the included license/acknowledgement text before reporting results.
+
+## MovieLens 1M Primary Experiment
+
+Optional official download:
+
+```powershell
+python scripts/download_movielens_1m.py --output-dir data/raw/movielens-1m
+```
+
+Offline verification of an existing manual download:
+
+```powershell
+python scripts/download_movielens_1m.py --output-dir data/raw/movielens-1m --verify-only
+```
+
+Preprocess and validate:
+
+```powershell
+python scripts/preprocess_movielens_1m.py `
+  --dataset-dir data/raw/movielens-1m/ml-1m `
+  --output-dir results/movielens-1m/normalized `
+  --strict-official-counts
+```
+
+Preflight the full Docker workflow without Hadoop jobs:
+
+```powershell
+powershell -ExecutionPolicy Bypass `
+  -File scripts/run_movielens_1m_docker.ps1 `
+  -DatasetDir data/raw/movielens-1m/ml-1m `
+  -TopL 50 `
+  -TopK 10 `
+  -MinCommonUsers 5 `
+  -RelevanceThreshold 4 `
+  -Reducers 4 `
+  -PreflightOnly
+```
+
+Run or resume the full MovieLens 1M pipeline:
+
+```powershell
+powershell -ExecutionPolicy Bypass `
+  -File scripts/run_movielens_1m_docker.ps1 `
+  -DatasetDir data/raw/movielens-1m/ml-1m `
+  -TopL 50 `
+  -TopK 10 `
+  -MinCommonUsers 5 `
+  -RelevanceThreshold 4 `
+  -Reducers 4 `
+  -Resume
+```
+
+Generate report data:
+
+```powershell
+python scripts/build_final_report_data.py --output-dir target/final-report-data
+```
+
+Run the read-only Streamlit demo:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_demo.ps1
+```
+
+The Streamlit UI loads only precomputed artifacts. It does not run Hadoop, Maven, Docker, or recommendation model code from UI interactions.
+
+See [docs/movielens_1m_primary_experiment.md](docs/movielens_1m_primary_experiment.md) for the complete primary experiment procedure.
+
 ## Preprocessing Usage
 
 Run the sample Netflix preprocessor from the repository root:
@@ -141,7 +218,7 @@ Generated files under `results` are local outputs and are not committed.
 
 ## Milestone 12 Final Validation
 
-Build report-ready facts from the generated full-reference artifacts:
+Build report-ready facts from the generated MovieLens 1M artifacts:
 
 ```powershell
 python scripts/build_final_report_data.py --output-dir target/final-report-data
@@ -171,7 +248,13 @@ Build the final source/documentation submission package:
 powershell -ExecutionPolicy Bypass -File scripts/build_submission_package.ps1
 ```
 
-Generated final outputs under `target/`, `results/full-reference-dataset/`, and `dist/` are ignored and should not be committed.
+Generated final outputs under `target/`, `results/movielens-1m/`, `results/full-reference-dataset/`, and `dist/` are ignored and should not be committed.
+
+The full-reference GitHub workflow is still available for compatibility validation:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_full_reference_dataset_docker.ps1
+```
 
 ## Java, Maven, and Hadoop Smoke Usage
 

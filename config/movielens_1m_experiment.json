@@ -1,0 +1,22 @@
+{
+  "dataset_name": "MovieLens 1M",
+  "dataset_role": "primary-experimental",
+  "generated_artifact_root": "results/movielens-1m",
+  "min_common_users": 5,
+  "methods": [
+    "cosine",
+    "cooccurrence"
+  ],
+  "raw_dataset_expected_files": [
+    "ratings.dat",
+    "movies.dat",
+    "users.dat",
+    "README"
+  ],
+  "reducers": 4,
+  "relevance_threshold": 4,
+  "split_method": "leave-one-out-by-exact-timestamp",
+  "timezone": "UTC",
+  "top_k": 10,
+  "top_l": 50
+}

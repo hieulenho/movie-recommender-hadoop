@@ -4,11 +4,16 @@ __pycache__/
 *.py[cod]
 data/raw/*
 !data/raw/.gitkeep
+data/raw/movielens-1m/
+data/raw/**/*.zip
 data/processed/*
 !data/processed/.gitkeep
 results/
 results/full-reference-dataset/
+results/movielens-1m/
 target/full-reference-dataset/
+target/final-report-data/
+target/final-validation/
 .idea/
 .vscode/
 .settings/

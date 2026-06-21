@@ -4,6 +4,8 @@
 
 Milestone 12 adds a reproducible run for the complete dataset subset included in the referenced GitHub repository `thviet79/Bigdata_Project_Recommender_System`.
 
+After the MovieLens 1M migration, this workflow is compatibility and regression validation only. It is not the primary final evaluation dataset and should appear in reports as appendix or secondary evidence.
+
 This run uses all 15 committed movie rating files from `Movie_DataSet`:
 
 ```text

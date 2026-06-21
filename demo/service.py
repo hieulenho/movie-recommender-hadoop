@@ -25,7 +25,15 @@ def build_history_rows(profile: UserProfile, metadata: Mapping[int, MovieMetadat
     rows = []
     for watched in profile.watched:
         movie = metadata.get(watched.movie_id) or fallback_movie_metadata(watched.movie_id)
-        rows.append({"Movie ID": watched.movie_id, "Title": movie.title, "Year": movie.year or "", "Rating": watched.rating})
+        rows.append(
+            {
+                "Movie ID": watched.movie_id,
+                "Title": movie.title,
+                "Year": movie.year or "",
+                "Genres": movie.genres,
+                "Rating": watched.rating,
+            }
+        )
     return rows
 
 
@@ -39,6 +47,7 @@ def build_recommendation_rows(profile: UserProfile, metadata: Mapping[int, Movie
                 "Movie ID": rec.movie_id,
                 "Title": movie.title,
                 "Year": movie.year or "",
+                "Genres": movie.genres,
                 "Predicted score": f"{rec.score:.10f}",
             }
         )
@@ -64,10 +73,10 @@ def build_user_summary(profile: UserProfile) -> dict[str, object]:
 def build_recommendation_csv(profile: UserProfile, metadata: Mapping[int, MovieMetadata]) -> str:
     buffer = io.StringIO()
     writer = csv.writer(buffer, lineterminator="\n")
-    writer.writerow(["rank", "movieId", "title", "year", "predictedScore"])
+    writer.writerow(["rank", "movieId", "title", "year", "genres", "predictedScore"])
     for rec in profile.recommendations:
         movie = metadata.get(rec.movie_id) or fallback_movie_metadata(rec.movie_id)
-        writer.writerow([rec.rank, rec.movie_id, movie.title, movie.year or "", rec.score_text])
+        writer.writerow([rec.rank, rec.movie_id, movie.title, movie.year or "", movie.genres, rec.score_text])
     return buffer.getvalue()
 
 
@@ -78,6 +87,7 @@ def summarize_evaluation_metrics(metrics: EvaluationMetrics | None) -> dict[str,
         "evaluation_method",
         "k",
         "relevance_threshold",
+        "test_rows",
         "prediction_coverage",
         "mae",
         "rmse",
@@ -90,6 +100,7 @@ def summarize_evaluation_metrics(metrics: EvaluationMetrics | None) -> dict[str,
         "missing_test_predictions",
         "ranking_eligible_users",
         "ranking_hits",
+        "recommendation_user_coverage",
         "train_test_overlap_rows",
         "watched_recommendations_found",
     ]

@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Milestone 11 adds a local Streamlit application that presents precomputed Hadoop recommendation artifacts. It is a read-only exploration layer for user histories, final Top-K recommendations, offline evaluation metrics, and scalability benchmark results.
+The Streamlit application is a read-only presentation layer over precomputed recommendation artifacts. MovieLens 1M is the primary real-artifact mode for final validation. The GitHub reference dataset remains available as compatibility mode, and the bundled sample remains available for UI smoke testing.
 
-The demo does not run Hadoop, Maven, Docker, model training, similarity calculation, recommendation scoring, watched-item filtering, or benchmark orchestration in response to UI interactions.
+The demo does not run Hadoop, Maven, Docker, preprocessing, model training, similarity calculation, recommendation scoring, watched-item filtering, or benchmark orchestration in response to UI interactions.
 
 ## Architecture
 
 ```text
-offline Hadoop artifacts
+precomputed offline artifacts
 -> pure Python artifact parsers
 -> integrity validation
 -> Streamlit read-only presentation layer
@@ -19,30 +19,42 @@ The recommender algorithm remains in the Java Hadoop pipeline. Streamlit display
 
 ## Data Modes
 
-Bundled sample mode uses tiny fixture rows based on Milestone 8 Top-K semantics and Milestone 9 evaluator fixture metrics. The UI labels it as a demonstration fixture, not as full Netflix Prize or final experimental results. Bundled movie titles are demonstration labels such as `Demo Movie 1`.
+MovieLens mode defaults to:
 
-Local-artifact mode accepts paths for required user-history and final Top-K recommendation artifacts, plus optional evaluation metrics JSON, benchmark results CSV, and movie metadata CSV.
+- `results/movielens-1m/common/user-history`
+- `results/movielens-1m/<method>/recommendations`
+- `results/movielens-1m/<method>/metrics.json`
+- `results/movielens-1m/normalized/movie_metadata.csv`
+- `results/movielens-1m/method_comparison.csv`
+- `results/movielens-1m/movielens_1m_manifest.json`
+
+The similarity selector switches between cosine and co-occurrence by loading different precomputed artifacts. It never recomputes recommendations.
+
+GitHub reference mode loads the preserved 15-movie compatibility workflow. Bundled sample mode uses tiny fixture rows and is labeled as a demonstration fixture, not final experimental output. Custom local-artifact mode accepts explicit paths for required user-history and recommendation artifacts plus optional metrics, benchmark, metadata, manifest, and method-comparison files.
 
 User-history and recommendation inputs may be either one text file or a Hadoop output directory containing sorted `part-*` files. `_SUCCESS`, hidden files, CRC files, and logs are ignored.
 
-Missing optional artifacts produce warnings and do not break the recommendation tab. Missing required artifacts prevent display of an invalid bundle.
-
 ## Formats
 
-The demo reuses documented artifact formats from `docs/data_format.md`: user histories, final Top-K recommendations, Milestone 9 metrics JSON, Milestone 10 benchmark CSV, and optional `movieId,title,year` metadata.
+The demo reuses documented formats from `docs/data_format.md`: user histories, final Top-K recommendations, metrics JSON, synthetic benchmark CSV, and optional movie metadata. Metadata may be either:
+
+```text
+movieId,title,year
+movieId,title,year,genres
+```
 
 Metadata is display-only. It never changes ranking, scores, filtering, metrics, or integrity checks. Missing metadata falls back to `Movie <movieId>`.
 
 ## Integrity Validation
 
-The loader and service validate positive IDs, rating and score ranges, finite scores, duplicate rows, recommendation order, unknown users, and watched-movie recommendation violations. Validation errors are shown concisely in the UI with technical detail in an expander.
+The loader and service validate positive IDs, rating and score ranges, finite scores, duplicate rows, recommendation order, unknown users, metadata coverage, and watched-movie recommendation violations. Validation errors are shown concisely in the UI.
 
 ## UI Tabs
 
-- `Gợi ý cho người dùng`: user selector, summary metrics, watched table, recommendation table, and selected-user CSV download.
-- `Đánh giá mô hình`: Milestone 9 metrics, missing-prediction reporting, leakage diagnostics, and watched-recommendation checks.
-- `Khả năng mở rộng`: Milestone 10 benchmark summaries, filtering, successful and failed runs, and stage runtime details.
-- `Kiến trúc hệ thống`: pipeline explanation, cosine formula, co-occurrence description, weighted-score formula, leakage prevention, and Docker local-mode limitation.
+- `User recommendations`: user selector, watched count, recommendation count, rating/score averages, watched movies, Top-K recommendations, genres, and selected-user CSV download.
+- `Evaluation`: MovieLens evaluation metrics, missing-prediction reporting, method comparison, train/test overlap, and watched-recommendation diagnostics.
+- `Scalability`: synthetic benchmark summaries. Synthetic scalability rows are shown separately from MovieLens quality metrics.
+- `Architecture`: MovieLens timestamp preprocessing, exact temporal split, train-only Hadoop pipeline, cosine/co-occurrence, Top-K, evaluator, and Docker local-mode limitation.
 
 ## Installation
 
@@ -74,19 +86,25 @@ Demo tests:
 powershell -ExecutionPolicy Bypass -File scripts/test_demo.ps1
 ```
 
-## Cache Policy
-
-`demo/app.py` uses `st.cache_data` for artifact loading. Cache keys include each artifact path, file size, and modification timestamp. For Hadoop output directories, all discovered `part-*` files are included in the signature. The cache never stores open file handles.
-
-## Regenerating Real Artifacts
-
-Evaluation artifacts:
+Final MovieLens validation:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts/run_offline_evaluation_docker.ps1 -Method cosine -TopK 2 -TopL 10 -MinCommonUsers 1 -RelevanceThreshold 4
+powershell -ExecutionPolicy Bypass -File scripts/validate_streamlit_final.ps1 -Method cosine
 ```
 
-Benchmark artifacts:
+## Cache Policy
+
+`demo/app.py` uses `st.cache_data` for artifact loading. Cache keys include each artifact path, file size, and modification timestamp. For Hadoop output directories, all discovered `part-*` files are included in the signature.
+
+## Regenerating Artifacts
+
+MovieLens primary artifacts:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_movielens_1m_docker.ps1 -DatasetDir data/raw/movielens-1m/ml-1m -Resume
+```
+
+Synthetic benchmark artifacts:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_docker.ps1 -Profile smoke
@@ -97,5 +115,4 @@ powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_doc
 - The demo is local and read-only.
 - It does not provide authentication, feedback collection, remote APIs, metadata downloads, databases, or online recommendation generation.
 - Benchmark results are Docker Hadoop local-mode measurements, not multi-node cluster scaling.
-- The next milestone is Milestone 12: final documentation, release, and submission.
-
+- Raw MovieLens files and generated MovieLens results remain untracked.

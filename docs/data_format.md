@@ -31,6 +31,56 @@ Example:
 
 Rows are written with UTF-8 encoding through the Python `csv` module.
 
+## MovieLens 1M Raw Format
+
+MovieLens 1M is the primary real experimental dataset.
+
+`ratings.dat`:
+
+```text
+UserID::MovieID::Rating::Timestamp
+```
+
+`movies.dat`:
+
+```text
+MovieID::Title::Genres
+```
+
+`users.dat`:
+
+```text
+UserID::Gender::Age::Occupation::Zip-code
+```
+
+The recommender validates `users.dat` for integrity but does not use demographic attributes.
+
+## MovieLens Timestamp-Preserved Rating CSV
+
+`scripts/preprocess_movielens_1m.py` writes:
+
+```text
+userId,movieId,rating,timestamp,dateTimeUtc,date
+```
+
+The Unix timestamp is preserved, `dateTimeUtc` and `date` are derived with UTC, and rows are ordered by user ID, timestamp, and movie ID.
+
+## MovieLens Hadoop Train/Test Rating CSV
+
+`scripts/split_movielens_1m.py` writes train and test files using the existing Hadoop-compatible schema:
+
+```text
+userId,movieId,rating,date
+```
+
+The split is leave-one-out by exact timestamp. The audit file `test_ratings_with_timestamp.csv` preserves:
+
+```text
+userId,movieId,rating,timestamp,dateTimeUtc,date
+```
+
+The held-out test file must not be used by Hadoop model-building stages.
+
 ## Implemented Item-CF Neighbor CSV Format
 
 Milestone 2 implements the neighbor CSV format produced by `scripts/itemcf_reference.py`.
@@ -373,6 +423,12 @@ Milestone 11 supports display-only movie metadata with this exact header:
 movieId,title,year
 ```
 
+MovieLens 1M metadata extends this format with an optional fourth column:
+
+```text
+movieId,title,year,genres
+```
+
 Rules:
 
 - `movieId` is a positive unique integer.
@@ -381,6 +437,25 @@ Rules:
 - When present, `year` is a reasonable four-digit integer.
 - Missing metadata falls back to `Movie <movieId>`.
 - Metadata never changes rankings, scores, filtering, or evaluation metrics.
+- `genres` remains pipe-separated when present.
+
+## MovieLens Full-Run Manifest
+
+`results/movielens-1m/movielens_1m_manifest.json` records the dataset name, role, source timestamp availability, split method, parameters, method statuses, artifact locations, and integrity fields such as train/test overlap and watched recommendation violations. Paths are repository-relative or external labels, not machine-specific absolute paths.
+
+## MovieLens Stage Metrics
+
+`results/movielens-1m/stage_metrics.json` records completed stage manifests with status, elapsed seconds, output row counts, output bytes, and the stage-manifest path.
+
+## MovieLens Method Comparison CSV
+
+`results/movielens-1m/method_comparison.csv` uses this header:
+
+```text
+method,dataset,ratingsRows,users,ratedMovies,metadataMovies,trainRows,testRows,topL,topK,minCommonUsers,relevanceThreshold,matchedPredictions,missingPredictions,predictionCoverage,mae,rmse,rankingEligibleUsers,rankingHits,recommendationUsers,recommendationUserCoverage,precisionAtK,recallAtK,hitRateAtK,ndcgAtK,mrrAtK,userHistorySeconds,pairStatisticsSeconds,similaritySeconds,scoringSeconds,topKSeconds,evaluationSeconds,totalPipelineSeconds,status
+```
+
+Empty cells represent genuinely unavailable values. NaN and Infinity are not valid outputs.
 
 ## Demo Manifest JSON
 
@@ -395,6 +470,12 @@ rank,movieId,title,year,predictedScore
 ```
 
 The CSV contains only the currently selected user's already precomputed offline recommendations.
+
+For MovieLens metadata, the Streamlit download includes genres:
+
+```text
+rank,movieId,title,year,genres,predictedScore
+```
 
 ## Environment Smoke Output
 

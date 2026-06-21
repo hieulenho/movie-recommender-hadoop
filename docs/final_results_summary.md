@@ -1,32 +1,35 @@
 # Final Results Summary
 
-## Full Reference Dataset
+## Primary MovieLens 1M Dataset
 
-The final full-reference run uses the 15 movie files available in `thviet79/Bigdata_Project_Recommender_System`, not the complete official Netflix Prize dataset.
+MovieLens 1M is the primary real experimental dataset. Populate this summary from `target/final-report-data/` after a completed full run.
 
 | Field | Value |
 |---|---:|
-| Rating rows | 21629 |
-| Distinct users | 20537 |
-| Distinct movies | 15 |
-| Train rows | 20741 |
-| Test rows | 888 |
-| Train/test overlap rows | 0 |
-| Watched recommendation violations | 0 |
+| Rating rows | Chưa có kết quả MovieLens 1M |
+| Distinct users | Chưa có kết quả MovieLens 1M |
+| Distinct rated movies | Chưa có kết quả MovieLens 1M |
+| Metadata movies | Chưa có kết quả MovieLens 1M |
+| Train rows | Chưa có kết quả MovieLens 1M |
+| Test rows | Chưa có kết quả MovieLens 1M |
+| Train/test overlap rows | Chưa có kết quả MovieLens 1M |
+| Watched recommendation violations | Chưa có kết quả MovieLens 1M |
 
-Source rows are `userId,movieId,rating` and contain no rating dates. The full-reference run therefore uses `deterministic-leave-one-out-by-item`: for each eligible user, ratings are sorted by numeric `movieId` and the highest `movieId` is held out. The placeholder date `1970-01-01` is written only after splitting for Hadoop schema compatibility.
+The split is deterministic leave-one-out by exact timestamp. The latest timestamp per user is held out, with highest movie ID used only as the tie-breaker for equal timestamps.
 
 ## Method Comparison
 
+Use `results/movielens-1m/method_comparison.csv`.
+
 | Method | Coverage | MAE | RMSE | Precision@K | Recall@K | NDCG@K | MRR@K | Local-mode seconds |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| cosine | 0.8592342342 | 1.2628957245 | 1.6590045822 | 0.0258675079 | 0.1293375394 | 0.0558198181 | 0.0328075710 | 27.285297 |
-| cooccurrence | 0.8547297297 | 1.2684552218 | 1.6720603280 | 0.0233438486 | 0.1167192429 | 0.0554198178 | 0.0362250263 | 38.672707 |
+| cosine | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M |
+| cooccurrence | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M |
 
-These values come from `results/full-reference-dataset/method_comparison.csv`.
+## Compatibility
+
+The GitHub reference 15-movie dataset remains useful for workflow regression and appendix discussion. It is not the primary final-quality experiment.
 
 ## Scalability
 
-Chưa có dữ liệu thực nghiệm.
-
-No real `target/scalability-benchmark/benchmark_results.csv` artifact was present during finalization. Docker Hadoop local-mode timings in the full-reference workflow should be described as single-container reproducibility timings, not multi-node scaling evidence.
+Synthetic benchmark rows remain scalability-only evidence. Docker Hadoop local-mode timings should be described as single-container reproducibility timings, not multi-node scaling evidence.

@@ -18,7 +18,10 @@ class SubmissionPackageTests(unittest.TestCase):
 
     def test_excludes_generated_and_raw_paths(self) -> None:
         self.assertTrue(is_excluded("data/raw/github-reference/mv_0000001.txt"))
+        self.assertTrue(is_excluded("data/raw/movielens-1m/ml-1m/ratings.dat"))
+        self.assertTrue(is_excluded("ml-1m.zip"))
         self.assertTrue(is_excluded("results/full-reference-dataset/method_comparison.csv"))
+        self.assertTrue(is_excluded("results/movielens-1m/movielens_1m_manifest.json"))
         self.assertTrue(is_excluded("target/final-report-data/final_report_facts.json"))
         self.assertFalse(is_excluded("scripts/build_submission_package.py"))
 

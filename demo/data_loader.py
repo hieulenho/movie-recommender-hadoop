@@ -181,8 +181,8 @@ def load_movie_metadata(path: Path | str) -> dict[int, MovieMetadata]:
         raise DemoValidationError(f"Metadata path does not exist: {metadata_path}")
     with metadata_path.open("r", encoding="utf-8", newline="") as input_file:
         reader = csv.DictReader(input_file)
-        if reader.fieldnames != ["movieId", "title", "year"]:
-            raise DemoValidationError("Movie metadata header must be: movieId,title,year")
+        if reader.fieldnames not in (["movieId", "title", "year"], ["movieId", "title", "year", "genres"]):
+            raise DemoValidationError("Movie metadata header must be: movieId,title,year or movieId,title,year,genres")
         rows: dict[int, MovieMetadata] = {}
         for line_number, row in enumerate(reader, start=2):
             movie_id = _parse_positive_int(row.get("movieId", ""), f"Line {line_number}: movieId")
@@ -197,12 +197,13 @@ def load_movie_metadata(path: Path | str) -> dict[int, MovieMetadata]:
                 if not year_text.isdigit() or len(year_text) != 4:
                     raise DemoValidationError(f"Line {line_number}: year must be a four-digit integer.")
                 year = int(year_text)
-            rows[movie_id] = MovieMetadata(movie_id, title, year, title.startswith("Demo Movie"))
+            genres = (row.get("genres") or "").strip()
+            rows[movie_id] = MovieMetadata(movie_id, title, year, genres, title.startswith("Demo Movie"))
         return rows
 
 
 def fallback_movie_metadata(movie_id: int) -> MovieMetadata:
-    return MovieMetadata(movie_id=movie_id, title=f"Movie {movie_id}", year=None)
+    return MovieMetadata(movie_id=movie_id, title=f"Movie {movie_id}", year=None, genres="")
 
 
 def load_evaluation_metrics(path: Path | str) -> EvaluationMetrics:

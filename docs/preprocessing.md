@@ -1,8 +1,8 @@
-# Netflix Preprocessing
+# Preprocessing
 
 ## Purpose
 
-The preprocessing tool converts Netflix Prize-style raw rating files into one normalized CSV file for later recommender and Hadoop milestones. It is an independent implementation and does not copy source code from the reference repository.
+The original preprocessing tool converts Netflix Prize-style raw rating files into one normalized CSV file for later recommender and Hadoop milestones. Milestone 12 adds MovieLens 1M preprocessing as the primary real experiment path.
 
 ## Supported Raw Format
 
@@ -102,6 +102,46 @@ Fatal filesystem and configuration errors return a non-zero exit code and print 
 Malformed input rows are nonfatal and are summarized in the statistics JSON.
 
 The Milestone 12 full reference dataset workflow adds a stricter validation layer before calling this preprocessor. For `data/raw/github-reference/`, malformed rows are fatal and no malformed row may be silently skipped.
+
+## MovieLens 1M Primary Preprocessing
+
+MovieLens 1M input files:
+
+```text
+ratings.dat
+movies.dat
+users.dat
+README
+```
+
+Run:
+
+```powershell
+python scripts/preprocess_movielens_1m.py --dataset-dir data/raw/movielens-1m/ml-1m --output-dir results/movielens-1m/normalized --strict-official-counts
+```
+
+Outputs:
+
+```text
+ratings_with_timestamp.csv
+movie_metadata.csv
+dataset_stats.json
+preprocessing_manifest.json
+```
+
+`ratings_with_timestamp.csv` preserves the original Unix timestamp and writes UTC-derived fields:
+
+```text
+userId,movieId,rating,timestamp,dateTimeUtc,date
+```
+
+`movie_metadata.csv` writes:
+
+```text
+movieId,title,year,genres
+```
+
+Malformed non-empty MovieLens rows are fatal. Exact duplicate rating records are ignored and counted. Conflicting duplicate user/movie records fail. Strict official mode requires 1,000,209 accepted ratings, 6,040 users, whole-star ratings from 1 through 5, and at least 20 ratings per user.
 
 ## Limitations
 

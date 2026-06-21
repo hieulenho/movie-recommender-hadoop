@@ -50,6 +50,8 @@ desktop.ini
 # Raw and processed datasets
 data/raw/*
 !data/raw/.gitkeep
+data/raw/movielens-1m/
+data/raw/**/*.zip
 data/processed/*
 !data/processed/.gitkeep
 
@@ -59,6 +61,7 @@ results/*
 results/evaluation/
 results/scalability/
 results/full-reference-dataset/
+results/movielens-1m/
 dist/
 
 # Generated Hadoop local output
@@ -87,6 +90,8 @@ demo/uploads/
 target/scalability-benchmark/
 target/scalability-data/
 target/full-reference-dataset/
+target/final-report-data/
+target/final-validation/
 scalability-benchmark-output/
 scalability-data/
 benchmark-results/

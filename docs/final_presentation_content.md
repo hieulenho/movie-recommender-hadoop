@@ -4,54 +4,69 @@
 
 - Build an offline Top-K movie recommender using Item-Based Collaborative Filtering.
 - Implement the scalable pipeline with Java Hadoop MapReduce jobs.
+- Use MovieLens 1M as the primary real experimental dataset.
 - Validate output with deterministic Python utilities, Docker local-mode Hadoop runs, and a read-only Streamlit demo.
 
-## Slide 2: Full Reference Dataset
+## Slide 2: Primary Dataset
 
-- Source: `thviet79/Bigdata_Project_Recommender_System`.
-- Scope: all 15 available `mv_*.txt` files in that repository.
-- Rows: 21629 ratings, 20537 users, 15 movies.
-- Input schema: `userId,movieId,rating`.
-- Date status: no source rating dates.
+- Source: MovieLens 1M from the official GroupLens distribution.
+- Files: `ratings.dat`, `movies.dat`, `users.dat`, `README`.
+- Ratings: Chưa có kết quả MovieLens 1M.
+- Users: Chưa có kết quả MovieLens 1M.
+- Rated movies: Chưa có kết quả MovieLens 1M.
+- Rating scale: whole-star integers from 1 through 5.
+- Timestamp handling: Unix timestamps preserved and converted with UTC.
 
 ## Slide 3: Split And Leakage Control
 
-- Split: deterministic non-temporal leave-one-out by highest movie ID.
-- Train rows: 20741; test rows: 888.
-- Train/test overlap rows: 0.
+- Split: leave-one-out by exact timestamp.
+- Train rows: Chưa có kết quả MovieLens 1M.
+- Test rows: Chưa có kết quả MovieLens 1M.
+- Train/test overlap rows: Chưa có kết quả MovieLens 1M.
 - Hadoop model-building stages consume train rows only.
-- Placeholder date `1970-01-01` exists only for schema compatibility after splitting.
+- Held-out test rows are read only by the evaluator.
 
 ## Slide 4: Pipeline
 
 ```text
-normalize raw ratings
--> split train/test
+MovieLens 1M ratings.dat
+-> exact timestamp preprocessing
+-> time-aware split
 -> user history
--> item-pair statistics
--> item similarity Top-L
+-> shared item-pair statistics
+-> cosine / co-occurrence Top-L
 -> raw recommendation scoring
 -> watched-item filtering and Top-K
--> offline evaluation
+-> held-out evaluation
 -> read-only demo
 ```
 
 ## Slide 5: Method Comparison
 
+Use `results/movielens-1m/method_comparison.csv`.
+
 | Method | Coverage | RMSE | Precision@K | Recall@K | NDCG@K | MRR@K |
 |---|---:|---:|---:|---:|---:|---:|
-| cosine | 0.8592342342 | 1.6590045822 | 0.0258675079 | 0.1293375394 | 0.0558198181 | 0.0328075710 |
-| cooccurrence | 0.8547297297 | 1.6720603280 | 0.0233438486 | 0.1167192429 | 0.0554198178 | 0.0362250263 |
+| cosine | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M |
+| cooccurrence | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M |
 
-## Slide 6: Demo
+## Slide 6: Scalability
 
-- Local artifacts can be loaded from `results/full-reference-dataset/cosine/`.
-- Demo displays user history, recommendations, evaluation metrics, and optional benchmark tables.
-- Demo is read-only and does not launch Hadoop or modify outputs.
+- Synthetic profiles are used for controlled scalability experiments.
+- Synthetic rows are not real recommendation-quality results.
+- Execution environment: one Docker Hadoop local-mode container.
+- Do not claim multi-node speedup.
 
-## Slide 7: Limitations
+## Slide 7: Demo
 
-- This is a 15-movie GitHub subset, not the full official Netflix Prize dataset.
-- Full-reference evaluation is non-temporal because the source has no dates.
-- Docker Hadoop local mode validates reproducibility, not multi-node cluster scaling.
-- Scalability benchmark: Chưa có dữ liệu thực nghiệm.
+- MovieLens mode loads `results/movielens-1m/`.
+- Cosine and co-occurrence are selected from precomputed artifacts.
+- Real movie titles and genres come from `movie_metadata.csv`.
+- Demo is read-only and does not launch Hadoop, Maven, Docker, or model code.
+
+## Slide 8: Compatibility And Limitations
+
+- GitHub reference 15-movie dataset remains compatibility validation and appendix material.
+- Raw MovieLens files are not committed or redistributed.
+- Missing predictions are reported, not imputed.
+- Docker local mode validates reproducibility, not distributed cluster scaling.
