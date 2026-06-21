@@ -1,37 +1,28 @@
 # Scalable Movie Recommender System Using Item-Based Collaborative Filtering and Hadoop MapReduce
 
-This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
+This repository contains an academic Big Data project that builds a scalable offline movie recommender system. The system uses Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 12 - MovieLens 1M primary experiment migration and final validation**.
+## Project Resources
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, reproducible scalability benchmark tooling, read-only Streamlit demo, GitHub reference-repository compatibility workflow, MovieLens 1M primary workflow, and final report/package helpers are implemented. Spark and Hadoop cluster deployment are not implemented.
+- **Project Drive & Dataset Link:** [Google Drive Folder](https://drive.google.com/drive/folders/1kx6gTTwtkcqMryqnqhO1ph2iiQI_Kw5J?usp=drive_link)
 
 ## Dataset Roles
 
-- **MovieLens 1M** is the primary real experimental dataset for final evaluation, report numbers, slides, and real-artifact Streamlit mode.
-- **GitHub reference 15-movie dataset** is retained for compatibility and regression workflow validation.
-- **Synthetic datasets** are used only for controlled scalability experiments.
+- **MovieLens 1M** is the primary experimental dataset for evaluation and the Streamlit demo.
+- **GitHub reference 15-movie dataset** is used for compatibility and regression workflow validation.
+- **Synthetic datasets** are used for controlled scalability experiments.
 
-Do not present synthetic scalability rows or GitHub 15-file compatibility metrics as final MovieLens recommendation-quality results.
-
-## Main Objectives
-
-- Define a clean repository structure for a Hadoop-based recommender project.
-- Document the planned architecture, data formats, and milestone roadmap.
-- Prepare the project for later implementation of preprocessing, MapReduce jobs, evaluation, and optional demo components.
-- Keep implementation decisions traceable through version-controlled documentation.
-
-## Planned Technologies
+## Technologies
 
 - Java
 - Apache Hadoop MapReduce
 - HDFS
 - Maven
-- Python for preprocessing, validation, and evaluation
-- Streamlit for the optional local read-only demo
-- Docker as a possible local Hadoop environment
+- Python (for preprocessing, validation, and evaluation)
+- Streamlit (for the local read-only demo)
+- Docker (for the local Hadoop environment)
 
-## Planned Pipeline
+## Pipeline
 
 ```text
 MovieLens 1M ratings.dat
@@ -47,71 +38,35 @@ MovieLens 1M ratings.dat
 -> read-only demo
 ```
 
-MovieLens 1M uses deterministic leave-one-out by exact Unix timestamp. The GitHub reference-repository run has no rating dates, so it remains a compatibility workflow using deterministic non-temporal leave-one-out by highest numeric `movieId`.
+MovieLens 1M uses deterministic leave-one-out by exact Unix timestamp. The GitHub reference dataset has no rating dates, so it relies on deterministic non-temporal leave-one-out by the highest numeric `movieId`.
 
 ## Repository Structure
 
 ```text
 .
 |-- README.md
-|-- AGENTS.md
 |-- .gitignore
 |-- docs/
-|   |-- project_scope.md
-|   |-- architecture.md
-|   |-- milestones.md
-|   |-- data_format.md
-|   |-- preprocessing.md
-|   |-- itemcf_reference.md
-|   |-- user_history_job.md
-|   |-- item_pair_statistics_job.md
-|   |-- item_similarity_job.md
-|   |-- recommendation_scoring_job.md
-|   |-- top_k_recommendation_job.md
-|   |-- offline_evaluation.md
-|   |-- scalability_experiments.md
-|   |-- demo_application.md
-|   |-- full_reference_dataset_run.md
-|   |-- final_report_content.md
-|   |-- final_presentation_content.md
-|   |-- submission_checklist.md
-|   |-- hadoop_environment.md
-|   `-- references.md
 |-- demo/
-|   |-- app.py
-|   |-- data_loader.py
-|   |-- service.py
-|   `-- sample/
 |-- .streamlit/
-|   `-- config.toml
 |-- data/
 |   |-- raw/
 |   |-- sample/
 |   `-- processed/
 |-- scripts/
-|   |-- run_demo.ps1
-|   |-- run_demo.sh
-|   |-- run_full_reference_dataset.sh
-|   |-- run_full_reference_dataset_docker.ps1
-|   `-- test_demo.ps1
 |-- src/
 |   |-- main/
-|   |   |-- java/
-|   |   `-- resources/
 |   `-- test/
-|       |-- java/
-|       `-- resources/
 |-- tests/
-|   `-- fixtures/
 |-- results/
 `-- report/
 ```
 
 ## Data Policy
 
-Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files must not be committed to Git. Contents under `data/raw`, `data/processed`, and generated `results` outputs are ignored except for placeholder files. Only tiny reviewable sample files may be committed under `data/sample` or `demo/sample`.
+Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files are ignored by Git. Only reviewable sample files are committed under `data/sample` or `demo/sample`.
 
-MovieLens 1M raw files are never committed or included in the submission ZIP. Acquire them from the official GroupLens source and review the included license/acknowledgement text before reporting results.
+MovieLens 1M raw files can be acquired from the official GroupLens source or the Project Drive linked above.
 
 ## MovieLens 1M Primary Experiment
 
@@ -176,8 +131,6 @@ Run the read-only Streamlit demo:
 powershell -ExecutionPolicy Bypass -File scripts/run_demo.ps1
 ```
 
-The Streamlit UI loads only precomputed artifacts. It does not run Hadoop, Maven, Docker, or recommendation model code from UI interactions.
-
 See [docs/movielens_1m_primary_experiment.md](docs/movielens_1m_primary_experiment.md) for the complete primary experiment procedure.
 
 ## Preprocessing Usage
@@ -214,9 +167,7 @@ Run the co-occurrence reference model:
 python scripts/itemcf_reference.py --input data/processed/ratings.csv --method cooccurrence --min-common-users 1 --top-l 50 --top-k 10 --neighbors-output results/reference/cooccurrence_neighbors.csv --recommendations-output results/reference/cooccurrence_recommendations.csv --stats-output results/reference/cooccurrence_stats.json
 ```
 
-Generated files under `results` are local outputs and are not committed.
-
-## Milestone 12 Final Validation
+## Final Validation
 
 Build report-ready facts from the generated MovieLens 1M artifacts:
 
@@ -247,8 +198,6 @@ Build the final source/documentation submission package:
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/build_submission_package.ps1
 ```
-
-Generated final outputs under `target/`, `results/movielens-1m/`, `results/full-reference-dataset/`, and `dist/` are ignored and should not be committed.
 
 The full-reference GitHub workflow is still available for compatibility validation:
 
@@ -287,10 +236,6 @@ Optional Docker validation:
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/test_hadoop_maven_docker.ps1
 ```
-
-Native Windows Hadoop local-mode execution can require unsupported Hadoop Windows binaries. Do not add `winutils.exe`, do not hard-code `HADOOP_HOME`, and use the Docker/Linux validation path for real local-mode Hadoop integration tests on Windows.
-
-Hadoop local mode is not a distributed cluster. HDFS and YARN are not started in this project environment.
 
 ## User History Hadoop Job Usage
 
@@ -334,8 +279,6 @@ The output format is:
 movieIdA,movieIdB<TAB>commonUsers,sumXY,sumX2,sumY2
 ```
 
-Movie pairs are unordered with `movieIdA < movieIdB`. The statistics match the Python Item-CF reference definitions and are intended for the similarity milestone.
-
 ## Item Similarity Hadoop Pipeline Usage
 
 Run fixture cosine similarity in Linux local mode:
@@ -363,8 +306,6 @@ The output format is:
 sourceMovieId,neighborMovieId<TAB>similarity,commonUsers
 ```
 
-Similarity rows are directed. Cosine emits symmetric values for both directions; row-normalized co-occurrence may be asymmetric. Similarity values are formatted with exactly 10 digits after the decimal point. Recommendation scoring consumes this directed Top-L output in Milestone 7.
-
 ## Recommendation Scoring Hadoop Pipeline Usage
 
 Run fixture raw recommendation scoring in Linux local mode:
@@ -384,8 +325,6 @@ The output format is:
 ```text
 userId,movieId<TAB>score
 ```
-
-Scores are weighted averages over retained directed Top-L similarities and are formatted with exactly 10 digits after the decimal point. Raw prediction rows may include movies the user has already rated; the Milestone 8 Top-K job consumes them and removes watched movies.
 
 ## Top-K Recommendation Hadoop Job Usage
 
@@ -407,11 +346,9 @@ The final offline output format is:
 userId<TAB>movieId:score,movieId:score,...
 ```
 
-Watched movies are removed, each user has at most Top-K recommendations, and ties are broken by movie ID ascending. The output is precomputed for downstream evaluation or display.
-
 ## Offline Evaluation Usage
 
-The Milestone 9 workflow creates a deterministic leave-one-out-by-time train/test split, builds all Hadoop recommender artifacts from the train split only, and evaluates raw predictions plus final Top-K recommendations against the held-out test ratings.
+The evaluation workflow creates a deterministic leave-one-out-by-time train/test split, builds all Hadoop recommender artifacts from the train split only, and evaluates raw predictions plus final Top-K recommendations against the held-out test ratings.
 
 Run the full Docker evaluation with cosine similarity:
 
@@ -425,13 +362,11 @@ Run the same workflow with row-normalized co-occurrence:
 powershell -ExecutionPolicy Bypass -File scripts/run_offline_evaluation_docker.ps1 -Method cooccurrence -TopK 2 -TopL 10 -MinCommonUsers 1 -RelevanceThreshold 4
 ```
 
-Generated evaluation artifacts include `split_stats.json`, `metrics.json`, `metrics.csv`, and `per_user_metrics.csv` under `target/offline-evaluation/`. Principal metrics include prediction coverage, MAE, RMSE, Precision@K, Recall@K, Hit Rate@K, NDCG@K, and MRR@K. Missing predictions are reported rather than imputed.
-
-The test split is never passed to User History, Item-Pair Statistics, Similarity, Scoring, or Top-K generation. Milestone 10 adds a separate benchmark workflow around this evaluation path without changing the core recommender pipeline.
+Generated evaluation artifacts include `split_stats.json`, `metrics.json`, `metrics.csv`, and `per_user_metrics.csv` under `target/offline-evaluation/`.
 
 ## Scalability Benchmark Usage
 
-Milestone 10 benchmarks the real Milestone 9 train-only Hadoop and evaluation workflow in Linux Docker local mode. Smoke is the normal validation profile:
+The benchmark executes the Hadoop and evaluation workflow in Linux Docker local mode. Smoke is the normal validation profile:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_docker.ps1 -Profile smoke
@@ -451,13 +386,11 @@ The extended profile may take significantly longer and can require more memory:
 powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_docker.ps1 -Profile extended
 ```
 
-Generated benchmark artifacts are written under `target/scalability-benchmark/` by default and remain ignored by Git. Principal outputs include `benchmark_results.csv`, `benchmark_results.json`, `benchmark_summary.md`, `method_comparison.csv`, `size_scaling.csv`, per-run manifests, stage metrics, split stats, evaluation metrics, and logs.
-
-These results are single-container Hadoop local-mode measurements. Multi-node cluster scaling, HDFS throughput, and YARN scheduling have not been measured.
+Generated benchmark artifacts are written under `target/scalability-benchmark/` by default. 
 
 ## Streamlit Demo Usage
 
-Milestone 11 adds a read-only Streamlit app for presenting precomputed offline artifacts. The app can load the bundled sample fixture or local artifacts produced by the existing offline evaluation and benchmark workflows. It never runs Hadoop, Maven, Docker, model training, similarity calculation, scoring, or recommendation generation from UI interactions.
+The read-only Streamlit app presents precomputed offline artifacts. The app can load the bundled sample fixture or local artifacts produced by the existing offline evaluation and benchmark workflows. 
 
 Install the demo dependency:
 
@@ -483,11 +416,9 @@ Run the demo-focused tests:
 powershell -ExecutionPolicy Bypass -File scripts/test_demo.ps1
 ```
 
-The bundled sample is labeled as a demonstration fixture and must not be treated as final experimental results. For real local artifacts, generate recommendations and metrics with the documented offline evaluation commands, generate benchmark CSV files with the scalability benchmark command, then point the app sidebar at those files or output directories.
-
 ## Full Reference Dataset Run
 
-Milestone 12 supports the complete dataset subset committed in the referenced GitHub repository: exactly `movie_titles.txt` plus `mv_0000001.txt` through `mv_0000015.txt` under `data/raw/github-reference/`. This is the complete 15-movie reference-repository subset, not the complete official Netflix Prize dataset. These rating files use `userId,movieId,rating` with no date column.
+This run supports the complete dataset subset committed in the referenced GitHub repository. 
 
 Run the full Docker workflow:
 
@@ -495,6 +426,4 @@ Run the full Docker workflow:
 powershell -ExecutionPolicy Bypass -File scripts/run_full_reference_dataset_docker.ps1 -DatasetDir data/raw/github-reference -TopL 10 -TopK 5 -MinCommonUsers 1 -RelevanceThreshold 4
 ```
 
-The workflow validates all 15 raw rating files, writes `results/full-reference-dataset/normalized/ratings.csv`, converts `movie_titles.txt` to Streamlit metadata, performs a deterministic non-temporal leave-one-out-by-item split, runs both cosine and row-normalized co-occurrence through the Hadoop local-mode pipeline, evaluates both methods, and exports report-ready tables. A fixed `1970-01-01` placeholder date is added only for Hadoop schema compatibility after the non-temporal split; it is not a real rating timestamp.
-
-Generated artifacts remain ignored by Git under `results/full-reference-dataset/`. Raw input remains ignored under `data/raw/`. Fixture outputs, synthetic benchmark outputs, dated offline-evaluation outputs, and undated full reference-repository outputs are distinct result categories and should be labeled separately in reports.
+The workflow validates raw rating files, performs a deterministic non-temporal leave-one-out-by-item split, runs similarity methods through the Hadoop local-mode pipeline, evaluates them, and exports report-ready tables.
