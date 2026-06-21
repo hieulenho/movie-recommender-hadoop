@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 11 - Streamlit Offline Recommendation Demo completed**.
+Current status: **Milestone 12 - Finalization and full reference dataset run in progress**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, reproducible scalability benchmark tooling, and read-only Streamlit demo are implemented. Spark and Hadoop cluster deployment are not implemented.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, reproducible scalability benchmark tooling, read-only Streamlit demo, and full GitHub reference-repository dataset workflow are implemented. Spark and Hadoop cluster deployment are not implemented.
 
 ## Main Objectives
 
@@ -61,6 +61,10 @@ raw data
 |   |-- offline_evaluation.md
 |   |-- scalability_experiments.md
 |   |-- demo_application.md
+|   |-- full_reference_dataset_run.md
+|   |-- final_report_content.md
+|   |-- final_presentation_content.md
+|   |-- submission_checklist.md
 |   |-- hadoop_environment.md
 |   `-- references.md
 |-- demo/
@@ -77,6 +81,8 @@ raw data
 |-- scripts/
 |   |-- run_demo.ps1
 |   |-- run_demo.sh
+|   |-- run_full_reference_dataset.sh
+|   |-- run_full_reference_dataset_docker.ps1
 |   `-- test_demo.ps1
 |-- src/
 |   |-- main/
@@ -359,3 +365,17 @@ powershell -ExecutionPolicy Bypass -File scripts/test_demo.ps1
 ```
 
 The bundled sample is labeled as a demonstration fixture and must not be treated as final experimental results. For real local artifacts, generate recommendations and metrics with the documented offline evaluation commands, generate benchmark CSV files with the scalability benchmark command, then point the app sidebar at those files or output directories.
+
+## Full Reference Dataset Run
+
+Milestone 12 supports the complete dataset subset committed in the referenced GitHub repository: exactly `movie_titles.txt` plus `mv_0000001.txt` through `mv_0000015.txt` under `data/raw/github-reference/`. This is the complete 15-movie reference-repository subset, not the complete official Netflix Prize dataset. These rating files use `userId,movieId,rating` with no date column.
+
+Run the full Docker workflow:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_full_reference_dataset_docker.ps1 -DatasetDir data/raw/github-reference -TopL 10 -TopK 5 -MinCommonUsers 1 -RelevanceThreshold 4
+```
+
+The workflow validates all 15 raw rating files, writes `results/full-reference-dataset/normalized/ratings.csv`, converts `movie_titles.txt` to Streamlit metadata, performs a deterministic non-temporal leave-one-out-by-item split, runs both cosine and row-normalized co-occurrence through the Hadoop local-mode pipeline, evaluates both methods, and exports report-ready tables. A fixed `1970-01-01` placeholder date is added only for Hadoop schema compatibility after the non-temporal split; it is not a real rating timestamp.
+
+Generated artifacts remain ignored by Git under `results/full-reference-dataset/`. Raw input remains ignored under `data/raw/`. Fixture outputs, synthetic benchmark outputs, dated offline-evaluation outputs, and undated full reference-repository outputs are distinct result categories and should be labeled separately in reports.

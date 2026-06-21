@@ -32,6 +32,7 @@ ENV/
 # Logs
 *.log
 logs/
+full-run-logs/
 
 # Environment and secret files
 .env
@@ -57,6 +58,7 @@ results/*
 !results/.gitkeep
 results/evaluation/
 results/scalability/
+results/full-reference-dataset/
 
 # Generated Hadoop local output
 hadoop-smoke-output/
@@ -83,6 +85,7 @@ demo/uploads/
 # Generated scalability benchmark artifacts
 target/scalability-benchmark/
 target/scalability-data/
+target/full-reference-dataset/
 scalability-benchmark-output/
 scalability-data/
 benchmark-results/
