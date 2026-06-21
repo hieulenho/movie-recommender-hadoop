@@ -286,20 +286,26 @@ def build_demo_bundle(
     }
     metadata: dict[int, MovieMetadata] = {}
     warnings: list[str] = []
-    if movie_metadata_path and Path(movie_metadata_path).exists():
+    if movie_metadata_path and Path(movie_metadata_path).is_file():
         metadata = load_movie_metadata(movie_metadata_path)
+    elif movie_metadata_path and Path(movie_metadata_path).exists():
+        warnings.append(f"Optional movie metadata is not a regular CSV file: {movie_metadata_path}")
     elif movie_metadata_path:
         warnings.append(f"Optional movie metadata not found: {movie_metadata_path}")
 
     evaluation = None
-    if evaluation_metrics_path and Path(evaluation_metrics_path).exists():
+    if evaluation_metrics_path and Path(evaluation_metrics_path).is_file():
         evaluation = load_evaluation_metrics(evaluation_metrics_path)
+    elif evaluation_metrics_path and Path(evaluation_metrics_path).exists():
+        warnings.append(f"Optional evaluation metrics is not a regular JSON file: {evaluation_metrics_path}")
     elif evaluation_metrics_path:
         warnings.append(f"Optional evaluation metrics not found: {evaluation_metrics_path}")
 
     benchmark_runs: tuple[BenchmarkRun, ...] = ()
-    if benchmark_results_path and Path(benchmark_results_path).exists():
+    if benchmark_results_path and Path(benchmark_results_path).is_file():
         benchmark_runs = load_benchmark_results(benchmark_results_path)
+    elif benchmark_results_path and Path(benchmark_results_path).exists():
+        warnings.append(f"Optional benchmark results is not a regular CSV file: {benchmark_results_path}")
     elif benchmark_results_path:
         warnings.append(f"Optional benchmark results not found: {benchmark_results_path}")
 

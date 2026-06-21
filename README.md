@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 12 - Finalization and full reference dataset run in progress**.
+Current status: **Milestone 12 - Finalization and v1.0.0 release-candidate preparation**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, reproducible scalability benchmark tooling, read-only Streamlit demo, and full GitHub reference-repository dataset workflow are implemented. Spark and Hadoop cluster deployment are not implemented.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, reproducible scalability benchmark tooling, read-only Streamlit demo, full GitHub reference-repository dataset workflow, and final report/package helpers are implemented. Spark and Hadoop cluster deployment are not implemented.
 
 ## Main Objectives
 
@@ -28,7 +28,7 @@ The Netflix raw rating preprocessor, local Python Item-CF reference implementati
 ```text
 raw data
 -> preprocessing
--> time-aware train/test split
+-> train/test split
 -> train-only user histories
 -> item-pair statistics
 -> item similarity
@@ -38,6 +38,8 @@ raw data
 -> evaluation
 -> read-only demo
 ```
+
+For dated datasets, the evaluation split can use the documented time-aware policy. The full GitHub reference-repository run has no rating dates, so it uses deterministic non-temporal leave-one-out by highest numeric `movieId`.
 
 ## Repository Structure
 
@@ -136,6 +138,40 @@ python scripts/itemcf_reference.py --input data/processed/ratings.csv --method c
 ```
 
 Generated files under `results` are local outputs and are not committed.
+
+## Milestone 12 Final Validation
+
+Build report-ready facts from the generated full-reference artifacts:
+
+```powershell
+python scripts/build_final_report_data.py --output-dir target/final-report-data
+```
+
+Validate final Streamlit demo artifacts:
+
+```powershell
+python scripts/validate_streamlit_final.py
+```
+
+Run the final manifest check:
+
+```powershell
+python scripts/run_final_validation.py
+```
+
+The optional all-in-one Windows wrapper runs Python tests, compile checks, Maven packaging, Docker Hadoop validation, demo validation, report-data extraction, and final manifest assembly:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_final_validation.ps1
+```
+
+Build the final source/documentation submission package:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build_submission_package.ps1
+```
+
+Generated final outputs under `target/`, `results/full-reference-dataset/`, and `dist/` are ignored and should not be committed.
 
 ## Java, Maven, and Hadoop Smoke Usage
 

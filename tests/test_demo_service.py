@@ -83,6 +83,10 @@ class DemoServiceTests(unittest.TestCase):
     def test_return_recommendations_in_offline_rank_order(self) -> None:
         self.assertEqual([row["Movie ID"] for row in build_recommendation_rows(self.profile, self.bundle.metadata)], [3, 4])
 
+    def test_detailed_recommendation_scores_keep_ten_decimal_places(self) -> None:
+        rows = build_recommendation_rows(self.profile, self.bundle.metadata)
+        self.assertEqual(rows[0]["Predicted score"], "3.8000000000")
+
     def test_handle_missing_optional_evaluation_data(self) -> None:
         bundle = DemoDataBundle(users=self.bundle.users, metadata=self.bundle.metadata)
         self.assertEqual(summarize_evaluation_metrics(bundle.evaluation), {})

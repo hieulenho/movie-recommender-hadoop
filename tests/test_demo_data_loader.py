@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from demo.data_loader import (
+    build_demo_bundle,
     discover_part_files,
     fallback_movie_metadata,
     load_benchmark_results,
@@ -236,6 +237,43 @@ class DemoDataLoaderTests(unittest.TestCase):
                 ),
             )
             self.assertEqual([run.experiment_id for run in load_benchmark_results(path)], ["a", "z"])
+
+    def test_empty_optional_paths_do_not_prevent_bundle_loading(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history = self.write(root / "history" / "part-r-00000", "101\t1:5\n")
+            recommendations = self.write(root / "recs" / "part-r-00000", "101\t2:4.0000000000\n")
+            bundle = build_demo_bundle(
+                history.parent,
+                recommendations.parent,
+                evaluation_metrics_path=None,
+                benchmark_results_path=None,
+                movie_metadata_path=None,
+            )
+            self.assertIn(101, bundle.users)
+            self.assertEqual(bundle.optional_warnings, tuple())
+
+    def test_optional_metadata_directory_is_warning_not_crash(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history = self.write(root / "history" / "part-r-00000", "101\t1:5\n")
+            recommendations = self.write(root / "recs" / "part-r-00000", "101\t2:4.0000000000\n")
+            metadata_dir = root / "metadata-dir"
+            metadata_dir.mkdir()
+            bundle = build_demo_bundle(history.parent, recommendations.parent, movie_metadata_path=metadata_dir)
+            self.assertEqual(bundle.metadata, {})
+            self.assertIn("not a regular CSV file", bundle.optional_warnings[0])
+
+    def test_optional_benchmark_directory_is_warning_not_crash(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            history = self.write(root / "history" / "part-r-00000", "101\t1:5\n")
+            recommendations = self.write(root / "recs" / "part-r-00000", "101\t2:4.0000000000\n")
+            benchmark_dir = root / "benchmark-dir"
+            benchmark_dir.mkdir()
+            bundle = build_demo_bundle(history.parent, recommendations.parent, benchmark_results_path=benchmark_dir)
+            self.assertEqual(bundle.benchmark_runs, tuple())
+            self.assertIn("not a regular CSV file", bundle.optional_warnings[0])
 
 
 if __name__ == "__main__":

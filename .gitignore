@@ -59,6 +59,7 @@ results/*
 results/evaluation/
 results/scalability/
 results/full-reference-dataset/
+dist/
 
 # Generated Hadoop local output
 hadoop-smoke-output/
