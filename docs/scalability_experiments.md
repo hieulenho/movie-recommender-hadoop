@@ -206,7 +206,7 @@ Use smoke results to prove the workflow is reproducible. Use standard results fo
 - Runs use one Docker container and Hadoop local mode.
 - No Hadoop daemons are started.
 - No Docker Compose cluster is created.
-- No Spark, web UI, database, online serving, metadata enrichment, or fallback recommender is included.
+- No Spark, database, online serving, metadata enrichment, or fallback recommender is included in the benchmark workflow. The later Streamlit demo reads completed artifacts only.
 - Synthetic datasets are controlled benchmark inputs, not real Netflix Prize measurements.
 
-Milestone 11 remains the optional demonstration application stage.
+Milestone 11 adds the optional demonstration application stage over already generated artifacts.

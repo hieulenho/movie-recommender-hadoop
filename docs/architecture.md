@@ -2,9 +2,9 @@
 
 ## Overview
 
-The planned system uses an offline batch architecture. Raw rating data will be prepared locally, stored in HDFS, processed by Java MapReduce jobs, and exported as precomputed recommendation files for evaluation or optional demonstration.
+The planned system uses an offline batch architecture. Raw rating data is prepared locally, stored in HDFS-compatible local-mode inputs for validation, processed by Java MapReduce jobs, and exported as precomputed recommendation files for evaluation or optional demonstration.
 
-The demo, if added in a later milestone, will read precomputed recommendations. It must not rerun the full Hadoop pipeline for each user request.
+The Streamlit demo reads precomputed recommendations and supporting metrics. It does not rerun the full Hadoop pipeline for each user request.
 
 ## Components
 
@@ -12,7 +12,7 @@ The demo, if added in a later milestone, will read precomputed recommendations. 
 - Maven provides the Java build layer for compiling, testing, packaging, and running local Hadoop smoke checks.
 - Java MapReduce jobs perform the Hadoop computations. `UserHistoryJob` is implemented for user-history construction, `ItemPairStatisticsJob` is implemented for co-rated unordered movie-pair statistics, `ItemSimilarityPipeline` is implemented for directed similarity and Top-L neighbor retention, `RecommendationScoringPipeline` is implemented for raw user-candidate score calculation, and `TopKRecommendationJob` is implemented for watched-item filtering and final Top-K recommendation lists.
 - Python scripts support preprocessing, local Item-CF reference validation, deterministic train/test splitting, offline evaluation, reproducible benchmark orchestration, and future plotting.
-- An optional demo application may load precomputed recommendation outputs for display.
+- The Streamlit demo application loads precomputed recommendation outputs for read-only display.
 
 ## Implemented And Planned Data Flow
 
@@ -31,6 +31,7 @@ flowchart TD
     H --> J
     T --> J
     J --> K[Benchmark Metrics And Summary Implemented]
+    K --> L[Streamlit Read-Only Demo]
 ```
 
 The held-out test ratings bypass user-history construction, item-pair statistics, similarity, scoring, and Top-K generation. They are read only by the offline evaluator after train-only Hadoop recommendation outputs have been produced.
@@ -140,3 +141,14 @@ normalized or synthetic ratings
 The benchmark runner uses the existing Java Hadoop jobs and evaluation scripts. It records dataset statistics, per-stage runtime, row counts, byte counts, evaluation metrics, manifests, logs, and summary CSV/Markdown files.
 
 The core recommendation pipeline is unchanged. The benchmark measures Linux Docker Hadoop local-mode behavior only; it does not start Hadoop daemons or measure a multi-node cluster.
+
+## Streamlit Read-Only Demo Stage
+
+Milestone 11 adds a local Streamlit presentation layer over offline artifacts:
+
+```text
+offline artifacts
+-> Streamlit read-only presentation layer
+```
+
+The demo loads user-history output, final Top-K recommendations, evaluation metrics, benchmark CSV files, and optional movie metadata. It does not run Hadoop, Maven, Docker, model training, similarity calculation, scoring, or recommendation generation from UI interactions.
