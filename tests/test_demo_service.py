@@ -50,11 +50,11 @@ class DemoServiceTests(unittest.TestCase):
 
     def test_correct_recommendation_csv_header(self) -> None:
         csv_text = build_recommendation_csv(self.profile, self.bundle.metadata)
-        self.assertEqual(csv_text.splitlines()[0], "rank,movieId,title,year,predictedScore")
+        self.assertEqual(csv_text.splitlines()[0], "rank,movieId,title,year,genres,predictedScore")
 
     def test_correct_selected_user_csv_rows(self) -> None:
         csv_text = build_recommendation_csv(self.profile, self.bundle.metadata)
-        self.assertIn("1,3,Demo Movie 3,,3.8000000000", csv_text)
+        self.assertIn("1,3,Demo Movie 3,,,3.8000000000", csv_text)
         self.assertNotIn("102,", csv_text)
 
     def test_detect_watched_recommendations(self) -> None:

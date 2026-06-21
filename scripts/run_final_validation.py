@@ -15,14 +15,15 @@ from scripts.final_artifact_utils import FinalArtifactError, load_json, repo_roo
 
 
 REQUIRED_ARTIFACTS = (
-    "results/full-reference-dataset/full_dataset_manifest.json",
-    "results/full-reference-dataset/normalized/dataset_stats.json",
-    "results/full-reference-dataset/split/split_stats.json",
-    "results/full-reference-dataset/method_comparison.csv",
-    "results/full-reference-dataset/cosine/metrics.json",
-    "results/full-reference-dataset/cooccurrence/metrics.json",
+    "results/movielens-1m/movielens_1m_manifest.json",
+    "results/movielens-1m/normalized/dataset_stats.json",
+    "results/movielens-1m/split/split_stats.json",
+    "results/movielens-1m/method_comparison.csv",
+    "results/movielens-1m/stage_metrics.json",
+    "results/movielens-1m/cosine/metrics.json",
+    "results/movielens-1m/cooccurrence/metrics.json",
     "target/final-report-data/final_report_facts.json",
-    "target/final-validation/streamlit_validation.json",
+    "target/final-validation/streamlit_movielens_1m_validation.json",
 )
 
 
@@ -50,16 +51,17 @@ def build_final_validation_manifest(repo_root: Path | str, output: Path | str) -
         if not record["exists"]:
             errors.append(f"Missing required artifact: {relative}")
 
-    manifest_path = root / "results/full-reference-dataset/full_dataset_manifest.json"
-    streamlit_path = root / "target/final-validation/streamlit_validation.json"
+    manifest_path = root / "results/movielens-1m/movielens_1m_manifest.json"
+    streamlit_path = root / "target/final-validation/streamlit_movielens_1m_validation.json"
     if manifest_path.exists():
         manifest = load_json(manifest_path)
         expected = {
             "completion_status": "completed",
-            "source_format": "github-reference-3col",
-            "source_has_dates": False,
-            "split_method": "deterministic-leave-one-out-by-item",
-            "train_test_overlap_count": 0,
+            "dataset_name": "MovieLens 1M",
+            "dataset_role": "primary-experimental",
+            "source_has_timestamps": True,
+            "split_method": "leave-one-out-by-exact-timestamp",
+            "train_test_overlap_rows": 0,
             "watched_recommendation_violations": 0,
         }
         for key, value in expected.items():
@@ -85,7 +87,7 @@ def build_final_validation_manifest(repo_root: Path | str, output: Path | str) -
         errors.append("git diff --check failed.")
 
     ignored_checks: dict[str, bool] = {}
-    for path in ("data/raw/github-reference", "results/full-reference-dataset", "target/final-report-data"):
+    for path in ("data/raw/movielens-1m", "results/movielens-1m", "target/final-report-data", "target/final-validation"):
         code, _out, _err = _run_git(root, ["check-ignore", path])
         ignored_checks[path] = code == 0
         if code != 0:

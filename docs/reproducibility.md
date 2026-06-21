@@ -15,7 +15,41 @@ Install demo dependencies when Streamlit validation is needed:
 python -m pip install -r requirements.txt
 ```
 
-## Full Reference Dataset
+## MovieLens 1M Primary Dataset
+
+Acquire MovieLens 1M from the official GroupLens source or place a manually downloaded copy under:
+
+```text
+data/raw/movielens-1m/ml-1m/
+```
+
+Required files are `ratings.dat`, `movies.dat`, `users.dat`, and `README`. Raw files are ignored and must not be committed.
+
+Verify existing local data without network access:
+
+```powershell
+python scripts/download_movielens_1m.py --output-dir data/raw/movielens-1m --verify-only
+```
+
+Run preprocessing:
+
+```powershell
+python scripts/preprocess_movielens_1m.py --dataset-dir data/raw/movielens-1m/ml-1m --output-dir results/movielens-1m/normalized --strict-official-counts
+```
+
+Run the preflight check:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_movielens_1m_docker.ps1 -DatasetDir data/raw/movielens-1m/ml-1m -TopL 50 -TopK 10 -MinCommonUsers 5 -RelevanceThreshold 4 -Reducers 4 -PreflightOnly
+```
+
+Run or resume the full local-mode Docker workflow:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_movielens_1m_docker.ps1 -DatasetDir data/raw/movielens-1m/ml-1m -TopL 50 -TopK 10 -MinCommonUsers 5 -RelevanceThreshold 4 -Reducers 4 -Resume
+```
+
+## GitHub Reference Compatibility Dataset
 
 Place the GitHub reference-repository files locally under:
 
@@ -95,6 +129,7 @@ Generated artifacts are intentionally ignored:
 
 ```text
 results/full-reference-dataset/
+results/movielens-1m/
 target/final-report-data/
 target/final-validation/
 dist/

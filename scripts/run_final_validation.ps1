@@ -39,7 +39,7 @@ function Invoke-FinalCommand {
 $Results = @()
 $Results += Invoke-FinalCommand "python-unittest" 'python -m unittest discover -s tests -p "test_*.py" -v' "python_unittest.log"
 $Results += Invoke-FinalCommand "python-compileall" 'python -m compileall scripts demo tests' "python_compileall.log"
-$Results += Invoke-FinalCommand "maven-package" 'mvn package' "maven_package.log"
+$Results += Invoke-FinalCommand "maven-package" 'mvn -DskipTests clean package' "maven_package.log"
 if (-not $SkipDocker) {
     $Results += Invoke-FinalCommand "docker-hadoop-maven" 'powershell -ExecutionPolicy Bypass -File scripts/test_hadoop_maven_docker.ps1' "docker_hadoop_maven.log"
 }

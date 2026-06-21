@@ -173,6 +173,12 @@ class DemoDataLoaderTests(unittest.TestCase):
             metadata = load_movie_metadata(path)
             self.assertEqual(metadata[1].title, "Demo Movie 1")
 
+    def test_parse_optional_metadata_genres_column(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self.write(Path(tmp) / "metadata.csv", "movieId,title,year,genres\n1,Toy Story,1995,Animation|Children's|Comedy\n")
+            metadata = load_movie_metadata(path)
+            self.assertEqual(metadata[1].genres, "Animation|Children's|Comedy")
+
     def test_reject_duplicate_metadata_movie_ids(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = self.write(Path(tmp) / "metadata.csv", "movieId,title,year\n1,A,\n1,B,\n")

@@ -1,59 +1,106 @@
 # Final Report Content
 
-## Dataset And Scope
+## Primary Dataset And Scope
 
-The final dataset run uses all 15 movie files available in the GitHub reference repository `thviet79/Bigdata_Project_Recommender_System`. It is not the complete official Netflix Prize dataset.
+The final report uses MovieLens 1M as the primary real experimental dataset.
 
-The input format is `userId,movieId,rating`. The source has no rating dates, so the full-reference workflow records `source_has_dates = false` and `source_date_status = unavailable`.
+Report generated values from `target/final-report-data/` after running:
 
-Key generated facts:
+```powershell
+python scripts/build_final_report_data.py --output-dir target/final-report-data
+```
 
-- Ratings: 21629
-- Distinct users: 20537
-- Distinct movies: 15
-- Exact duplicate rows ignored: 0
-- Normalized CSV SHA-256: `66a9c5c4e282467d0cbeb849cbd842a40682fac8fc737a8bce44f1025da4fc01`
+Primary artifact sources:
+
+- `results/movielens-1m/normalized/dataset_stats.json`
+- `results/movielens-1m/split/split_stats.json`
+- `results/movielens-1m/method_comparison.csv`
+- `results/movielens-1m/stage_metrics.json`
+- `results/movielens-1m/movielens_1m_manifest.json`
+- `target/final-validation/streamlit_movielens_1m_validation.json`
+
+Required dataset facts:
+
+- Dataset: MovieLens 1M
+- Role: primary real experiment
+- Rating rows: Chưa có kết quả MovieLens 1M
+- Distinct users: Chưa có kết quả MovieLens 1M
+- Distinct rated movies: Chưa có kết quả MovieLens 1M
+- Metadata movies: Chưa có kết quả MovieLens 1M
+- Rating scale: whole-star integer ratings from 1 through 5
+- Timestamp range UTC: Chưa có kết quả MovieLens 1M
+
+Do not substitute the GitHub 15-file dataset when a MovieLens value is missing.
 
 ## Split Protocol
 
-The full-reference split is `deterministic-leave-one-out-by-item`. For each eligible user, ratings are sorted by numeric movie ID and the highest movie ID is held out. Users with only one rating remain train-only.
+MovieLens 1M uses deterministic leave-one-out by exact timestamp:
 
-The placeholder date `1970-01-01` is added only after splitting so Hadoop jobs can read the existing `userId,movieId,rating,date` schema. It must not be interpreted as a real timestamp.
+1. Sort each user's ratings by Unix timestamp ascending.
+2. Break equal timestamps by movie ID ascending.
+3. Hold out the final record.
 
-Split facts:
+Required split facts:
 
-- Train rows: 20741
-- Test rows: 888
-- Train/test overlap rows: 0
+- Split method: leave-one-out-by-exact-timestamp
+- Train rows: Chưa có kết quả MovieLens 1M
+- Test rows: Chưa có kết quả MovieLens 1M
+- Train/test overlap rows: Chưa có kết quả MovieLens 1M
+
+The held-out test set must not enter user-history, pair-statistics, similarity, scoring, or Top-K stages.
+
+## Pipeline Parameters
+
+Document the actual run parameters from the MovieLens manifest:
+
+- Top-L: Chưa có kết quả MovieLens 1M
+- Top-K: Chưa có kết quả MovieLens 1M
+- Minimum common users: Chưa có kết quả MovieLens 1M
+- Relevance threshold: Chưa có kết quả MovieLens 1M
+- Reducers: Chưa có kết quả MovieLens 1M
+
+Defaults are documented experiment defaults, not universal optima.
 
 ## Method Metrics
 
+Use `results/movielens-1m/method_comparison.csv`.
+
 | Method | Coverage | MAE | RMSE | Precision@K | Recall@K | HitRate@K | NDCG@K | MRR@K | Total seconds |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| cosine | 0.8592342342 | 1.2628957245 | 1.6590045822 | 0.0258675079 | 0.1293375394 | 0.1293375394 | 0.0558198181 | 0.0328075710 | 27.285297 |
-| cooccurrence | 0.8547297297 | 1.2684552218 | 1.6720603280 | 0.0233438486 | 0.1167192429 | 0.1167192429 | 0.0554198178 | 0.0362250263 | 38.672707 |
+| cosine | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M |
+| cooccurrence | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M | Chưa có kết quả MovieLens 1M |
 
-Source files:
+Do not claim statistical significance from one deterministic run.
 
-- `results/full-reference-dataset/method_comparison.csv`
-- `results/full-reference-dataset/cosine/metrics.json`
-- `results/full-reference-dataset/cooccurrence/metrics.json`
+## Stage Outputs And Runtime
 
-## Demo Validation
+Use `results/movielens-1m/stage_metrics.json` for row counts, byte counts, and runtime by stage.
 
-The Streamlit demo is read-only. It loads user-history, recommendation, metadata, metrics, and optional benchmark artifacts. It does not run Hadoop, Maven, Docker, preprocessing, or model-building jobs.
+Call out that `common/pair-statistics` is built once and shared by cosine and co-occurrence.
 
-Recommended full-reference artifact paths:
+## Streamlit Validation
 
-- User history: `results/full-reference-dataset/cosine/user-history/`
-- Recommendations: `results/full-reference-dataset/cosine/recommendations/`
-- Metadata: `results/full-reference-dataset/metadata/movie_metadata.csv`
-- Metrics: `results/full-reference-dataset/cosine/metrics.json`
+The Streamlit demo is read-only. It loads MovieLens user-history, recommendations, metadata, metrics, and optional synthetic benchmark artifacts. It does not run Hadoop, Maven, Docker, preprocessing, or model-building jobs.
+
+Recommended MovieLens artifact paths:
+
+- User history: `results/movielens-1m/common/user-history/`
+- Cosine recommendations: `results/movielens-1m/cosine/recommendations/`
+- Co-occurrence recommendations: `results/movielens-1m/cooccurrence/recommendations/`
+- Metadata: `results/movielens-1m/normalized/movie_metadata.csv`
+- Metrics: `results/movielens-1m/<method>/metrics.json`
+
+Report validation status from `target/final-validation/streamlit_movielens_1m_validation.json`.
+
+## Compatibility And Scalability Sections
+
+The GitHub 15-file workflow should appear as compatibility or appendix validation only. It should not be described as the final recommendation-quality dataset.
+
+Synthetic benchmark results should appear only in the scalability section. Docker Hadoop local mode is single-container reproducibility validation, not multi-node cluster speedup.
 
 ## Limitations
 
-- The final run uses a 15-movie GitHub reference subset, not the complete official Netflix Prize corpus.
-- The source has no dates; evaluation is deterministic non-temporal holdout, not leave-one-out-by-time.
-- The small movie count limits item-item coverage, candidate diversity, and generalizability.
-- Docker Hadoop local-mode timing is single-container reproducibility timing, not multi-node cluster scaling.
-- Scalability benchmark status: Chưa có dữ liệu thực nghiệm.
+- Raw MovieLens 1M files are not redistributed or committed.
+- Missing predictions are reported and are not imputed as zero.
+- Docker Hadoop local mode does not start HDFS/YARN daemons and does not measure distributed cluster scaling.
+- Generated results under `results/movielens-1m/` and `target/final-report-data/` remain untracked.

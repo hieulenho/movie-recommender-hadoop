@@ -74,12 +74,15 @@ class MovieMetadata:
     movie_id: int
     title: str
     year: int | None = None
+    genres: str = ""
     is_demo_label: bool = False
 
     def __post_init__(self) -> None:
         _require_positive_int(self.movie_id, "movie_id")
         if not self.title.strip():
             raise DemoValidationError("title must not be blank.")
+        if self.genres is None:
+            raise DemoValidationError("genres must be a string.")
         if self.year is not None and (self.year < 1888 or self.year > 2100):
             raise DemoValidationError("year must be a reasonable four-digit integer.")
 

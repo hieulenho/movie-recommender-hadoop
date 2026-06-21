@@ -6,6 +6,8 @@ The planned system uses an offline batch architecture. Raw rating data is prepar
 
 The Streamlit demo reads precomputed recommendations and supporting metrics. It does not rerun the full Hadoop pipeline for each user request.
 
+Milestone 12 makes MovieLens 1M the primary real experimental dataset. The GitHub 15-movie workflow remains as compatibility validation, and synthetic profiles remain scalability-only inputs.
+
 ## Components
 
 - HDFS will act as distributed storage for normalized ratings, intermediate MapReduce outputs, similarity data, prediction scores, and final recommendations.
@@ -18,19 +20,19 @@ The Streamlit demo reads precomputed recommendations and supporting metrics. It 
 
 ```mermaid
 flowchart TD
-    A[Raw Dataset] --> B[Preprocessing]
-    B --> C[Time-Aware Train/Test Split Implemented]
+    A[MovieLens 1M ratings.dat] --> B[Timestamp-Preserving Preprocessing]
+    B --> C[Exact Timestamp Leave-One-Out Split]
     C --> D[Train Ratings Only]
     C --> T[Held-Out Test Ratings]
     D --> E[User History Job Implemented]
     E --> F[Pair Statistics Job Implemented]
-    F --> G[Item Similarity and Top-L Implemented]
+    F --> G[Cosine and Co-occurrence Top-L]
     G --> H[Recommendation Scoring Implemented]
     H --> I[Watched Filtering and Top-K Implemented]
     I --> J[Offline Evaluator Implemented]
     H --> J
     T --> J
-    J --> K[Benchmark Metrics And Summary Implemented]
+    J --> K[MovieLens Method Comparison And Report Facts]
     K --> L[Streamlit Read-Only Demo]
 ```
 
@@ -152,3 +154,24 @@ offline artifacts
 ```
 
 The demo loads user-history output, final Top-K recommendations, evaluation metrics, benchmark CSV files, and optional movie metadata. It does not run Hadoop, Maven, Docker, model training, similarity calculation, scoring, or recommendation generation from UI interactions.
+
+## MovieLens 1M Primary Finalization Stage
+
+Milestone 12 wraps the implemented train-only Hadoop pipeline in the MovieLens 1M workflow:
+
+```text
+MovieLens 1M ratings.dat
+-> exact timestamp preprocessing
+-> time-aware split
+-> train-only Hadoop pipeline
+-> shared pair statistics
+-> cosine/cooccurrence
+-> raw scoring
+-> watched filtering
+-> Top-K
+-> held-out evaluation
+-> report artifacts
+-> read-only Streamlit
+```
+
+`common/user-history` and `common/pair-statistics` are shared by both similarity methods. The test split never enters user-history, pair-statistics, similarity, scoring, or Top-K stages. It is read only by the evaluator after precomputed train-only artifacts exist.
