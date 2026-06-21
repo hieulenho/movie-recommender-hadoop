@@ -12,9 +12,11 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.streamlit/cache/
 
 # Virtual environments
 .venv/
+.venv-demo/
 venv/
 env/
 ENV/
@@ -75,6 +77,8 @@ hadoop-recommendation-scoring-output/
 top-k-recommendation-output/
 hadoop-top-k-recommendation-output/
 offline-evaluation-output/
+uploaded-artifacts/
+demo/uploads/
 
 # Generated scalability benchmark artifacts
 target/scalability-benchmark/

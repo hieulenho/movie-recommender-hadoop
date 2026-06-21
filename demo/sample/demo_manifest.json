@@ -1,0 +1,15 @@
+{
+  "artifact_descriptions": {
+    "evaluation_metrics.json": "Manually verified Milestone 9 evaluator fixture metrics.",
+    "movie_metadata.csv": "Demonstration-only labels for movie IDs 1 through 4.",
+    "recommendations.txt": "Small final Top-K fixture based on Milestone 8 semantics.",
+    "user_history.txt": "Small user-history fixture based on Milestone 8 semantics."
+  },
+  "dataset_type": "demo-fixture",
+  "source_milestone_references": [
+    "Milestone 4 user-history format",
+    "Milestone 8 final Top-K recommendation format",
+    "Milestone 9 offline evaluation metrics"
+  ],
+  "warning": "Demonstration fixture — these values are for validating the interface, not final experimental results."
+}

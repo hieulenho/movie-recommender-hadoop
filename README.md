@@ -2,9 +2,9 @@
 
 This repository contains the planned structure and documentation for an academic Big Data project that will build a scalable offline movie recommender system. The final system is intended to use Item-Based Collaborative Filtering with Apache Hadoop MapReduce to generate Top-K movie recommendations from historical rating data.
 
-Current status: **Milestone 10 - Reproducible Scalability and Performance Experiments in progress**.
+Current status: **Milestone 11 - Streamlit Offline Recommendation Demo completed**.
 
-The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, and reproducible scalability benchmark tooling are implemented. Spark, a web UI, and Hadoop cluster deployment are not implemented.
+The Netflix raw rating preprocessor, local Python Item-CF reference implementation, Maven/Hadoop smoke environment, User History MapReduce job, Item-Pair Statistics MapReduce job, Item Similarity/Top-L Neighbors MapReduce pipeline, raw Recommendation Scoring MapReduce pipeline, final watched-item filtering/Top-K recommendation job, deterministic offline evaluation workflow, reproducible scalability benchmark tooling, and read-only Streamlit demo are implemented. Spark and Hadoop cluster deployment are not implemented.
 
 ## Main Objectives
 
@@ -20,6 +20,7 @@ The Netflix raw rating preprocessor, local Python Item-CF reference implementati
 - HDFS
 - Maven
 - Python for preprocessing, validation, and evaluation
+- Streamlit for the optional local read-only demo
 - Docker as a possible local Hadoop environment
 
 ## Planned Pipeline
@@ -35,6 +36,7 @@ raw data
 -> filtering watched movies
 -> Top-K recommendations
 -> evaluation
+-> read-only demo
 ```
 
 ## Repository Structure
@@ -58,13 +60,24 @@ raw data
 |   |-- top_k_recommendation_job.md
 |   |-- offline_evaluation.md
 |   |-- scalability_experiments.md
+|   |-- demo_application.md
 |   |-- hadoop_environment.md
 |   `-- references.md
+|-- demo/
+|   |-- app.py
+|   |-- data_loader.py
+|   |-- service.py
+|   `-- sample/
+|-- .streamlit/
+|   `-- config.toml
 |-- data/
 |   |-- raw/
 |   |-- sample/
 |   `-- processed/
 |-- scripts/
+|   |-- run_demo.ps1
+|   |-- run_demo.sh
+|   `-- test_demo.ps1
 |-- src/
 |   |-- main/
 |   |   |-- java/
@@ -80,7 +93,7 @@ raw data
 
 ## Data Policy
 
-Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files must not be committed to Git. Contents under `data/raw`, `data/processed`, and generated `results` outputs are ignored except for placeholder files. Only tiny reviewable sample files may be committed under `data/sample`.
+Large datasets, processed data, generated outputs, build artifacts, secrets, and local environment files must not be committed to Git. Contents under `data/raw`, `data/processed`, and generated `results` outputs are ignored except for placeholder files. Only tiny reviewable sample files may be committed under `data/sample` or `demo/sample`.
 
 ## Preprocessing Usage
 
@@ -316,3 +329,33 @@ powershell -ExecutionPolicy Bypass -File scripts/run_scalability_experiments_doc
 Generated benchmark artifacts are written under `target/scalability-benchmark/` by default and remain ignored by Git. Principal outputs include `benchmark_results.csv`, `benchmark_results.json`, `benchmark_summary.md`, `method_comparison.csv`, `size_scaling.csv`, per-run manifests, stage metrics, split stats, evaluation metrics, and logs.
 
 These results are single-container Hadoop local-mode measurements. Multi-node cluster scaling, HDFS throughput, and YARN scheduling have not been measured.
+
+## Streamlit Demo Usage
+
+Milestone 11 adds a read-only Streamlit app for presenting precomputed offline artifacts. The app can load the bundled sample fixture or local artifacts produced by the existing offline evaluation and benchmark workflows. It never runs Hadoop, Maven, Docker, model training, similarity calculation, scoring, or recommendation generation from UI interactions.
+
+Install the demo dependency:
+
+```powershell
+python -m pip install -r requirements-demo.txt
+```
+
+Run the demo from PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_demo.ps1
+```
+
+Or run it from a POSIX shell:
+
+```bash
+bash scripts/run_demo.sh
+```
+
+Run the demo-focused tests:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/test_demo.ps1
+```
+
+The bundled sample is labeled as a demonstration fixture and must not be treated as final experimental results. For real local artifacts, generate recommendations and metrics with the documented offline evaluation commands, generate benchmark CSV files with the scalability benchmark command, then point the app sidebar at those files or output directories.

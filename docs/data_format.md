@@ -365,6 +365,37 @@ profile,method,ratingsRows,experimentId,repetition,totalPipelineSeconds,runtimeG
 
 Zero denominators produce empty fields, not NaN or Infinity.
 
+## Optional Movie Metadata CSV
+
+Milestone 11 supports display-only movie metadata with this exact header:
+
+```text
+movieId,title,year
+```
+
+Rules:
+
+- `movieId` is a positive unique integer.
+- `title` must not be blank.
+- `year` may be blank.
+- When present, `year` is a reasonable four-digit integer.
+- Missing metadata falls back to `Movie <movieId>`.
+- Metadata never changes rankings, scores, filtering, or evaluation metrics.
+
+## Demo Manifest JSON
+
+The bundled demo sample includes `demo_manifest.json` with `dataset_type`, `artifact_descriptions`, `source_milestone_references`, and `warning`. The bundled sample is labeled `demo-fixture` and must not be described as full-dataset experimental output.
+
+## User Recommendation Download CSV
+
+The Streamlit demo can download one selected user's recommendations with this exact header:
+
+```text
+rank,movieId,title,year,predictedScore
+```
+
+The CSV contains only the currently selected user's already precomputed offline recommendations.
+
 ## Environment Smoke Output
 
 Milestone 3 includes a temporary Hadoop local-mode smoke output for environment validation only:

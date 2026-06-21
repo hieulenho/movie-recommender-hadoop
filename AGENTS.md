@@ -44,6 +44,11 @@
 - Synthetic benchmark datasets and synthetic benchmark results must be clearly labeled as synthetic.
 - Runtime variation must be reported honestly; do not make statistical claims from a single repetition.
 - Do not invent unavailable Hadoop counters, HDFS byte counts, shuffle byte counts, or scheduler metrics.
+- Demo UI must remain read-only and must not execute Hadoop, Maven, Docker, or model-generation commands.
+- Demo UI parsing must reuse documented artifact semantics.
+- Demo sample values must be labeled as fixtures and not final experimental results.
+- Missing optional demo artifacts must not break required recommendation functionality.
+- No fabricated benchmark results may be presented as experimental results.
 - Do not silently change architecture.
 - Do not run destructive Git commands.
 - Do not create Git commits unless explicitly requested.

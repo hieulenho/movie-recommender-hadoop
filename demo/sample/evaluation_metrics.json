@@ -1,0 +1,23 @@
+{
+  "dataset_type": "demo-fixture",
+  "evaluation_method": "leave-one-out-offline-v1",
+  "hit_rate_at_k": 0.6666666667,
+  "k": 2,
+  "mae": 0.6666666667,
+  "matched_test_predictions": 3,
+  "missing_test_predictions": 1,
+  "mrr_at_k": 0.5,
+  "ndcg_at_k": 0.5436432512,
+  "precision_at_k": 0.3333333333,
+  "prediction_coverage": 0.75,
+  "ranking_eligible_users": 3,
+  "ranking_hits": 2,
+  "recall_at_k": 0.6666666667,
+  "recommendation_user_coverage": 0.75,
+  "relevance_threshold": 4,
+  "rmse": 0.7071067812,
+  "test_rows": 4,
+  "train_test_overlap_rows": 0,
+  "users_with_recommendations": 3,
+  "watched_recommendations_found": 0
+}
